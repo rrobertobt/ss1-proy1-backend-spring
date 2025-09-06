@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
- * DTO for 2FA verification request
+ * DTO for 2FA verification request - matches PDF specification exactly
  */
 @Data
 @Schema(description = "2FA verification request data")

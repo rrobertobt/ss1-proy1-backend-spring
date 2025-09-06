@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO for refresh token response
+ * DTO for refresh token response - matches PDF specification exactly
  */
 @Data
 @NoArgsConstructor

@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO for user registration response
+ * DTO for user registration response - matches PDF specification exactly
  */
 @Data
 @NoArgsConstructor

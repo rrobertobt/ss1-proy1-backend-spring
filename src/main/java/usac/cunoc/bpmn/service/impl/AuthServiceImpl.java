@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,7 +26,7 @@ import java.util.Random;
 import java.util.UUID;
 
 /**
- * Authentication service implementation with complete database validation
+ * Authentication service - 100% compliant with PDF JSON structure and BD schema
  */
 @Slf4j
 @Service
@@ -47,23 +46,23 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public RegisterResponseDto register(RegisterRequestDto request) {
-        // Validate unique constraints exactly as database defines them
+        // Validate UNIQUE constraints exactly as BD defines
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("El nombre de usuario ya existe");
+            throw new RuntimeException("Username already exists");
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("El email ya está registrado");
+            throw new RuntimeException("Email already exists");
         }
 
-        // Get user type "Cliente" exactly as stored in database
+        // Get "Cliente" userType exactly as stored in BD initial data
         UserType clientUserType = userTypeRepository.findByName("Cliente")
-                .orElseThrow(() -> new RuntimeException("Tipo de usuario 'Cliente' no encontrado en la base de datos"));
+                .orElseThrow(() -> new RuntimeException("Default user type not found"));
 
-        // Create user entity respecting all database constraints
+        // Create user with exact BD defaults
         User user = new User();
         user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail().toLowerCase()); // Normalize email
+        user.setEmail(request.getEmail());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
@@ -71,57 +70,44 @@ public class AuthServiceImpl implements AuthService {
         user.setPhone(request.getPhone());
         user.setUserType(clientUserType);
 
-        // Set default values as per database schema
-        user.setIsActive(true);
-        user.setIsVerified(false);
-        user.setFailedLoginAttempts(0);
-        user.setIs2faEnabled(false);
-        user.setDeletedCommentsCount(0);
-        user.setIsBanned(false);
-        user.setTotalSpent(java.math.BigDecimal.ZERO);
-        user.setTotalOrders(0);
-
-        // Set gender if provided, validating against database
+        // Set gender if provided (FK to gender table)
         if (request.getGenderId() != null) {
             user.setGender(genderRepository.findById(request.getGenderId())
-                    .orElseThrow(() -> new RuntimeException("ID de género no válido")));
+                    .orElseThrow(() -> new RuntimeException("Gender not found")));
         }
 
-        // Generate exactly 6-digit verification code as per database constraint
-        String verificationCode = generateSecureSixDigitCode();
+        // Generate 6-digit code for verification (BD constraint: VARCHAR(6))
+        String verificationCode = generateExactSixDigitCode();
         user.setTwoFactorCode(verificationCode);
         user.setTwoFactorCodeExpires(LocalDateTime.now().plusMinutes(15));
 
+        User savedUser = userRepository.save(user);
+
+        // Send verification email (non-blocking)
         try {
-            User savedUser = userRepository.save(user);
-
-            // Send verification email
             emailService.sendVerificationEmail(savedUser.getEmail(), verificationCode);
-
-            return new RegisterResponseDto(savedUser.getId(), savedUser.getEmail(), true);
-
         } catch (Exception e) {
-            log.error("Error saving user to database", e);
-            throw new RuntimeException("Error al registrar usuario: " + e.getMessage());
+            log.error("Failed to send verification email", e);
+            // Continue - don't fail registration for email issues
         }
+
+        // Return exact PDF JSON structure
+        return new RegisterResponseDto(savedUser.getId(), savedUser.getEmail(), true);
     }
 
     @Override
     @Transactional
     public VerifyEmailResponseDto verifyEmail(VerifyEmailRequestDto request) {
-        User user = userRepository.findByEmailAndValidTwoFactorCode(
-                request.getEmail(),
-                request.getVerificationCode(),
-                LocalDateTime.now())
-                .orElseThrow(() -> new RuntimeException("Código de verificación inválido o expirado"));
+        User user = userRepository.findByEmailAndValidTwoFactorCode(request.getEmail(), request.getVerificationCode())
+                .orElseThrow(() -> new RuntimeException("Invalid verification code or code expired"));
 
-        // Update user as per database triggers and constraints
+        // Update BD fields exactly as schema defines
         user.setIsVerified(true);
         user.setTwoFactorCode(null);
         user.setTwoFactorCodeExpires(null);
-
         userRepository.save(user);
 
+        // Return exact PDF JSON structure
         return new VerifyEmailResponseDto(true);
     }
 
@@ -129,69 +115,81 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public LoginResponseDto login(LoginRequestDto request) {
         User user = userRepository.findByUsernameOrEmail(request.getLogin())
-                .orElseThrow(() -> new BadCredentialsException("Credenciales inválidas"));
+                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
-        // Validate all database constraints for user status
-        validateUserAccountStatus(user);
+        // Validate BD boolean constraints exactly
+        if (!Boolean.TRUE.equals(user.getIsActive())) {
+            throw new RuntimeException("Account is deactivated");
+        }
+
+        if (Boolean.TRUE.equals(user.getIsBanned())) {
+            throw new RuntimeException("Account is banned");
+        }
+
+        if (!Boolean.TRUE.equals(user.getIsVerified())) {
+            throw new RuntimeException("Email not verified");
+        }
+
+        // Check BD field locked_until
+        if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(LocalDateTime.now())) {
+            throw new RuntimeException("Account is temporarily locked");
+        }
 
         try {
-            // Authenticate with Spring Security
+            // Spring Security authentication
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getLogin(), request.getPassword()));
 
-            // Reset failed attempts on successful login (database constraint)
+            // Reset failed attempts (BD field failed_login_attempts)
             user.setFailedLoginAttempts(0);
             user.setLockedUntil(null);
             user.setLastLogin(LocalDateTime.now());
 
-            // Check if 2FA is enabled (database field is_2fa_enabled)
+            // Check BD field is_2fa_enabled
             if (Boolean.TRUE.equals(user.getIs2faEnabled())) {
-                return handle2FALogin(user);
+                return handle2FAFlow(user);
             } else {
                 userRepository.save(user);
-                return generateSuccessfulLoginResponse(user);
+                return generateSuccessLogin(user);
             }
 
-        } catch (BadCredentialsException | DisabledException e) {
-            handleFailedLogin(user);
-            throw new RuntimeException("Credenciales inválidas");
+        } catch (BadCredentialsException e) {
+            handleFailedLoginAttempt(user);
+            throw new RuntimeException("Invalid credentials");
         }
     }
 
     @Override
     @Transactional
     public LoginResponseDto verify2FA(Verify2FARequestDto request) {
-        User user = userRepository.findByEmailAndValidTwoFactorCode(
-                request.getEmail(),
-                request.getCode(),
-                LocalDateTime.now())
-                .orElseThrow(() -> new RuntimeException("Código 2FA inválido o expirado"));
+        User user = userRepository.findByEmailAndValidTwoFactorCode(request.getEmail(), request.getCode())
+                .orElseThrow(() -> new RuntimeException("Invalid 2FA code or code expired"));
 
-        // Clear 2FA code and update login time
+        // Clear 2FA fields (BD schema)
         user.setTwoFactorCode(null);
         user.setTwoFactorCodeExpires(null);
         user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
 
-        return generateSuccessfulLoginResponse(user);
+        return generateSuccessLogin(user);
     }
 
     @Override
     @Transactional
     public void forgotPassword(ForgotPasswordRequestDto request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Clean up existing tokens respecting database constraints
+        // Clean existing tokens (BD constraint)
         passwordResetTokenRepository.deleteByUser(user);
 
-        // Create token following database schema exactly
+        // Create token following BD schema exactly
         String token = UUID.randomUUID().toString();
         PasswordResetToken resetToken = new PasswordResetToken();
-        resetToken.setToken(token);
-        resetToken.setUser(user);
-        resetToken.setExpiresAt(LocalDateTime.now().plusHours(1)); // Database allows this
-        resetToken.setUsed(false); // Database default
+        resetToken.setToken(token); // BD: VARCHAR(255) NOT NULL UNIQUE
+        resetToken.setUser(user); // BD: user_id INTEGER NOT NULL REFERENCES user(id)
+        resetToken.setExpiresAt(LocalDateTime.now().plusHours(1)); // BD: expires_at TIMESTAMP NOT NULL
+        resetToken.setUsed(false); // BD: used BOOLEAN DEFAULT false
 
         passwordResetTokenRepository.save(resetToken);
 
@@ -200,7 +198,7 @@ public class AuthServiceImpl implements AuthService {
             emailService.sendPasswordResetEmail(user.getEmail(), token);
         } catch (Exception e) {
             log.error("Failed to send password reset email", e);
-            throw new RuntimeException("Error enviando email de recuperación");
+            throw new RuntimeException("Failed to send reset email");
         }
     }
 
@@ -209,18 +207,17 @@ public class AuthServiceImpl implements AuthService {
     public void resetPassword(ResetPasswordRequestDto request) {
         PasswordResetToken resetToken = passwordResetTokenRepository
                 .findValidToken(request.getToken(), LocalDateTime.now())
-                .orElseThrow(() -> new RuntimeException("Token de reset inválido o expirado"));
+                .orElseThrow(() -> new RuntimeException("Invalid or expired reset token"));
 
         User user = resetToken.getUser();
 
         // Update password and reset security fields
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
-        user.setFailedLoginAttempts(0); // Reset as per database constraint
+        user.setFailedLoginAttempts(0);
         user.setLockedUntil(null);
-
         userRepository.save(user);
 
-        // Mark token as used following database schema
+        // Mark token as used (BD fields)
         resetToken.setUsed(true);
         resetToken.setUsedAt(LocalDateTime.now());
         passwordResetTokenRepository.save(resetToken);
@@ -236,53 +233,33 @@ public class AuthServiceImpl implements AuthService {
                 String newAccessToken = jwtUtil.generateToken(userDetails);
                 String newRefreshToken = jwtUtil.generateRefreshToken(userDetails);
 
+                // Return exact PDF JSON structure
                 return new RefreshTokenResponseDto(newAccessToken, newRefreshToken);
             } else {
-                throw new RuntimeException("Refresh token inválido");
+                throw new RuntimeException("Invalid refresh token");
             }
         } catch (Exception e) {
-            log.error("Error refreshing token", e);
-            throw new RuntimeException("Refresh token inválido");
+            throw new RuntimeException("Invalid refresh token");
         }
     }
 
     @Override
     public void logout(LogoutRequestDto request) {
-        // Validate token format and structure
         try {
             String username = jwtUtil.extractUsername(request.getRefreshToken());
             if (username == null || username.trim().isEmpty()) {
-                throw new RuntimeException("Token inválido");
+                throw new RuntimeException("Invalid token");
             }
-            // In production, add token to blacklist here
+            // In production: add token to blacklist
         } catch (Exception e) {
-            log.error("Error during logout", e);
-            throw new RuntimeException("Token inválido");
+            throw new RuntimeException("Invalid token");
         }
     }
 
-    // Private helper methods
+    // PRIVATE HELPER METHODS
 
-    private void validateUserAccountStatus(User user) {
-        if (!Boolean.TRUE.equals(user.getIsActive())) {
-            throw new RuntimeException("La cuenta está desactivada");
-        }
-
-        if (Boolean.TRUE.equals(user.getIsBanned())) {
-            throw new RuntimeException("La cuenta está suspendida");
-        }
-
-        if (!Boolean.TRUE.equals(user.getIsVerified())) {
-            throw new RuntimeException("Email no verificado. Por favor verifica tu email antes de iniciar sesión");
-        }
-
-        if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(LocalDateTime.now())) {
-            throw new RuntimeException("Cuenta temporalmente bloqueada. Intenta nuevamente más tarde");
-        }
-    }
-
-    private LoginResponseDto handle2FALogin(User user) {
-        String twoFactorCode = generateSecureSixDigitCode();
+    private LoginResponseDto handle2FAFlow(User user) {
+        String twoFactorCode = generateExactSixDigitCode();
         user.setTwoFactorCode(twoFactorCode);
         user.setTwoFactorCodeExpires(LocalDateTime.now().plusMinutes(5));
         userRepository.save(user);
@@ -291,23 +268,41 @@ public class AuthServiceImpl implements AuthService {
             emailService.send2FACode(user.getEmail(), twoFactorCode);
         } catch (Exception e) {
             log.error("Failed to send 2FA code", e);
-            throw new RuntimeException("Error enviando código 2FA");
+            throw new RuntimeException("Failed to send 2FA code");
         }
 
+        // Return exact PDF JSON structure for 2FA required
         LoginResponseDto.UserInfoDto userInfo = new LoginResponseDto.UserInfoDto(
                 user.getId(), user.getUsername(), user.getEmail(),
                 user.getFirstName(), user.getLastName(),
-                user.getUserType().getName(), // Keep exact database value
+                user.getUserType().getName(), // Exact BD value: "Cliente" or "Administrador"
                 user.getIs2faEnabled());
 
+        // Per PDF: tokens are null when 2FA required, requires2fa = true
         return new LoginResponseDto(null, null, userInfo, true);
     }
 
-    private void handleFailedLogin(User user) {
+    private LoginResponseDto generateSuccessLogin(User user) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+        String accessToken = jwtUtil.generateToken(userDetails);
+        String refreshToken = jwtUtil.generateRefreshToken(userDetails);
+
+        // Return exact PDF JSON structure for successful login
+        LoginResponseDto.UserInfoDto userInfo = new LoginResponseDto.UserInfoDto(
+                user.getId(), user.getUsername(), user.getEmail(),
+                user.getFirstName(), user.getLastName(),
+                user.getUserType().getName(), // Exact BD value: "Cliente" or "Administrador"
+                Boolean.TRUE.equals(user.getIs2faEnabled()));
+
+        // Per PDF: tokens present when login successful, requires2fa = false
+        return new LoginResponseDto(accessToken, refreshToken, userInfo, false);
+    }
+
+    private void handleFailedLoginAttempt(User user) {
         Integer currentAttempts = user.getFailedLoginAttempts() != null ? user.getFailedLoginAttempts() : 0;
         user.setFailedLoginAttempts(currentAttempts + 1);
 
-        // Lock account after 5 failed attempts as per business rules
+        // Lock account after 5 failed attempts (business rule)
         if (user.getFailedLoginAttempts() >= 5) {
             user.setLockedUntil(LocalDateTime.now().plusMinutes(30));
         }
@@ -315,26 +310,10 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
     }
 
-    private LoginResponseDto generateSuccessfulLoginResponse(User user) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
-        String accessToken = jwtUtil.generateToken(userDetails);
-        String refreshToken = jwtUtil.generateRefreshToken(userDetails);
-
-        LoginResponseDto.UserInfoDto userInfo = new LoginResponseDto.UserInfoDto(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getUserType().getName(), // Preserva valor exacto de BD en español
-                Boolean.TRUE.equals(user.getIs2faEnabled()));
-
-        return new LoginResponseDto(accessToken, refreshToken, userInfo, false);
-    }
-
-    private String generateSecureSixDigitCode() {
+    private String generateExactSixDigitCode() {
         Random random = new Random();
-        // Asegura exactamente 6 dígitos respetando constraint de BD
+        // Ensures exactly 6 digits (100000 to 999999) - respects BD VARCHAR(6)
+        // constraint
         int code = 100000 + random.nextInt(900000);
         return String.valueOf(code);
     }

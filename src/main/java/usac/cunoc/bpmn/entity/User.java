@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * User entity representing registered users in the system
+ * User entity - 100% compliant with database schema
  */
 @Entity
 @Table(name = "\"user\"")
@@ -51,11 +51,12 @@ public class User {
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 
-    @Column(name = "is_active")
-    private Boolean isActive = true;
+    // Defaults exactos según esquema BD
+    @Column(name = "is_active", columnDefinition = "BOOLEAN DEFAULT true")
+    private Boolean isActive;
 
-    @Column(name = "is_verified")
-    private Boolean isVerified = false;
+    @Column(name = "is_verified", columnDefinition = "BOOLEAN DEFAULT false")
+    private Boolean isVerified;
 
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
@@ -66,37 +67,58 @@ public class User {
     @Column(name = "two_factor_code_expires")
     private LocalDateTime twoFactorCodeExpires;
 
-    @Column(name = "failed_login_attempts")
-    private Integer failedLoginAttempts = 0;
+    @Column(name = "failed_login_attempts", columnDefinition = "INTEGER DEFAULT 0")
+    private Integer failedLoginAttempts;
 
     @Column(name = "locked_until")
     private LocalDateTime lockedUntil;
 
-    @Column(name = "is_2fa_enabled")
-    private Boolean is2faEnabled = false;
+    @Column(name = "is_2fa_enabled", columnDefinition = "BOOLEAN DEFAULT false")
+    private Boolean is2faEnabled;
 
-    @Column(name = "deleted_comments_count")
-    private Integer deletedCommentsCount = 0;
+    @Column(name = "deleted_comments_count", columnDefinition = "INTEGER DEFAULT 0")
+    private Integer deletedCommentsCount;
 
-    @Column(name = "is_banned")
-    private Boolean isBanned = false;
+    @Column(name = "is_banned", columnDefinition = "BOOLEAN DEFAULT false")
+    private Boolean isBanned;
 
-    @Column(name = "total_spent", precision = 10, scale = 2)
-    private BigDecimal totalSpent = BigDecimal.ZERO;
+    @Column(name = "total_spent", precision = 10, scale = 2, columnDefinition = "DECIMAL(10,2) DEFAULT 0.00")
+    private BigDecimal totalSpent;
 
-    @Column(name = "total_orders")
-    private Integer totalOrders = 0;
+    @Column(name = "total_orders", columnDefinition = "INTEGER DEFAULT 0")
+    private Integer totalOrders;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
+
+        // Set defaults exactos según BD schema si son null
+        if (this.isActive == null)
+            this.isActive = true;
+        if (this.isVerified == null)
+            this.isVerified = false;
+        if (this.failedLoginAttempts == null)
+            this.failedLoginAttempts = 0;
+        if (this.is2faEnabled == null)
+            this.is2faEnabled = false;
+        if (this.deletedCommentsCount == null)
+            this.deletedCommentsCount = 0;
+        if (this.isBanned == null)
+            this.isBanned = false;
+        if (this.totalSpent == null)
+            this.totalSpent = BigDecimal.ZERO;
+        if (this.totalOrders == null)
+            this.totalOrders = 0;
+        if (this.createdAt == null)
+            this.createdAt = now;
+        if (this.updatedAt == null)
+            this.updatedAt = now;
     }
 
     @PreUpdate

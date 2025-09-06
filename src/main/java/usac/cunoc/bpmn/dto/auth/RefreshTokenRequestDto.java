@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
- * DTO for refresh token request
+ * DTO for refresh token request - matches PDF specification exactly
  */
 @Data
 @Schema(description = "Refresh token request data")

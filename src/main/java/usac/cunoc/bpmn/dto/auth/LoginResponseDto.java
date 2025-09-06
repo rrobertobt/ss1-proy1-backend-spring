@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO for user login response
+ * DTO for user login response - matches PDF specification exactly
  */
 @Data
 @NoArgsConstructor
@@ -29,7 +29,7 @@ public class LoginResponseDto {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(description = "Basic user information")
+    @Schema(description = "User information according to PDF specification")
     public static class UserInfoDto {
         @Schema(description = "User ID", example = "1")
         private Integer id;
