@@ -165,33 +165,6 @@
 			<version>1.7</version>
 		</dependency>
 
-		<!-- File Upload/Download -->
-		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-			<version>1.5</version>
-		</dependency>
-
-		<!-- Excel Processing (for reports) -->
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>5.2.4</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>5.2.4</version>
-		</dependency>
-
-		<!-- PDF Generation (for invoices/reports) -->
-		<dependency>
-			<groupId>com.itextpdf</groupId>
-			<artifactId>itext7-core</artifactId>
-			<version>7.2.5</version>
-		</dependency>
-
 		<!-- HTTP Client for external APIs -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
