@@ -1,8 +1,6 @@
 package usac.cunoc.bpmn.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,11 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import usac.cunoc.bpmn.dto.auth.*;
 import usac.cunoc.bpmn.dto.common.ApiResponseDto;
-import usac.cunoc.bpmn.dto.common.ErrorResponseDto;
 import usac.cunoc.bpmn.service.AuthService;
 
 /**
- * Authentication controller - exact PDF JSON compliance
+ * Authentication controller with responses matching PDF specification exactly
  */
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -37,8 +34,6 @@ public class AuthController {
                         @Valid @RequestBody RegisterRequestDto request) {
 
                 RegisterResponseDto response = authService.register(request);
-
-                // Exact PDF response structure
                 return ResponseEntity.status(HttpStatus.CREATED)
                                 .body(ApiResponseDto.success("Usuario registrado exitosamente", response));
         }
@@ -53,8 +48,6 @@ public class AuthController {
                         @Valid @RequestBody VerifyEmailRequestDto request) {
 
                 VerifyEmailResponseDto response = authService.verifyEmail(request);
-
-                // Exact PDF response structure
                 return ResponseEntity.ok(ApiResponseDto.success("Email verificado exitosamente", response));
         }
 
@@ -69,8 +62,12 @@ public class AuthController {
 
                 LoginResponseDto response = authService.login(request);
 
-                // Exact PDF response structure - no message in success response for login
-                return ResponseEntity.ok(ApiResponseDto.success(null, response));
+                // Si requires2fa es true, no devolvemos mensaje "Login exitoso"
+                if (Boolean.TRUE.equals(response.getRequires2fa())) {
+                        return ResponseEntity.ok(ApiResponseDto.success(null, response));
+                } else {
+                        return ResponseEntity.ok(ApiResponseDto.success(null, response));
+                }
         }
 
         @PostMapping("/verify-2fa")
@@ -83,8 +80,6 @@ public class AuthController {
                         @Valid @RequestBody Verify2FARequestDto request) {
 
                 LoginResponseDto response = authService.verify2FA(request);
-
-                // Exact PDF response structure - no message in success response for 2FA
                 return ResponseEntity.ok(ApiResponseDto.success(null, response));
         }
 
@@ -98,8 +93,6 @@ public class AuthController {
                         @Valid @RequestBody ForgotPasswordRequestDto request) {
 
                 authService.forgotPassword(request);
-
-                // Exact PDF response structure
                 return ResponseEntity.ok(ApiResponseDto.success("Se ha enviado un enlace de recuperación a tu email"));
         }
 
@@ -113,8 +106,6 @@ public class AuthController {
                         @Valid @RequestBody ResetPasswordRequestDto request) {
 
                 authService.resetPassword(request);
-
-                // Exact PDF response structure
                 return ResponseEntity.ok(ApiResponseDto.success("Contraseña restablecida exitosamente"));
         }
 
@@ -128,8 +119,6 @@ public class AuthController {
                         @Valid @RequestBody RefreshTokenRequestDto request) {
 
                 RefreshTokenResponseDto response = authService.refreshToken(request);
-
-                // Exact PDF response structure - no message in success response for refresh
                 return ResponseEntity.ok(ApiResponseDto.success(null, response));
         }
 
@@ -143,8 +132,6 @@ public class AuthController {
                         @Valid @RequestBody LogoutRequestDto request) {
 
                 authService.logout(request);
-
-                // Exact PDF response structure
                 return ResponseEntity.ok(ApiResponseDto.success("Sesión cerrada exitosamente"));
         }
 }
