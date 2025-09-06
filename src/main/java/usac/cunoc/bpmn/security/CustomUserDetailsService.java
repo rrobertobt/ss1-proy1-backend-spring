@@ -29,15 +29,17 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPasswordHash(),
-                user.getIsActive(),
+                user.getIsActive() != null ? user.getIsActive() : false,
                 true,
                 true,
-                !user.getIsBanned(),
+                user.getIsBanned() != null ? !user.getIsBanned() : true,
                 getAuthorities(user));
     }
 
     private Collection<? extends GrantedAuthority> getAuthorities(User user) {
+        // Respetando los valores exactos de la base de datos en español
+        String roleName = user.getUserType().getName();
         return Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_" + user.getUserType().getName().toUpperCase()));
+                new SimpleGrantedAuthority("ROLE_" + roleName.toUpperCase()));
     }
 }
