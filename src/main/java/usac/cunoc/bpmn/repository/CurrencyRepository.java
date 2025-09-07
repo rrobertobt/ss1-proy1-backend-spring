@@ -20,4 +20,9 @@ public interface CurrencyRepository extends JpaRepository<Currency, Integer> {
      * Find currency by name
      */
     Optional<Currency> findByName(String name);
+
+    /**
+     * Check if currency code exists
+     */
+    boolean existsByCode(String code);
 }

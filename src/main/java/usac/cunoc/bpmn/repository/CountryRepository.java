@@ -20,4 +20,14 @@ public interface CountryRepository extends JpaRepository<Country, Integer> {
      * Find country by country code
      */
     Optional<Country> findByCountryCode(String countryCode);
+
+    /**
+     * Check if country name exists
+     */
+    boolean existsByName(String name);
+
+    /**
+     * Check if country code exists
+     */
+    boolean existsByCountryCode(String countryCode);
 }
