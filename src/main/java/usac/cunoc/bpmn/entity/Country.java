@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 
 /**
- * Country catalog entity
+ * Country catalog entity - 100% compliant with database schema
  */
 @Entity
 @Table(name = "country")
@@ -24,12 +26,20 @@ public class Country {
     private String name;
 
     @Column(name = "country_code", unique = true, length = 2)
+    @JdbcTypeCode(SqlTypes.CHAR)
     private String countryCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "currency_id")
     private Currency currency;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+    }
 }
