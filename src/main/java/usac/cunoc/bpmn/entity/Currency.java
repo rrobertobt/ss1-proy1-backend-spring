@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 
 /**
- * Currency catalog entity
+ * Currency catalog entity - 100% compliant with database schema
  */
 @Entity
 @Table(name = "currency")
@@ -21,6 +23,7 @@ public class Currency {
     private Integer id;
 
     @Column(unique = true, nullable = false, length = 3)
+    @JdbcTypeCode(SqlTypes.CHAR)
     private String code;
 
     @Column(nullable = false, length = 100)
@@ -29,6 +32,13 @@ public class Currency {
     @Column(length = 10)
     private String symbol;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+    }
 }

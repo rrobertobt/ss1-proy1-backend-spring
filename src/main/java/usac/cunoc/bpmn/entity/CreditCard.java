@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 
 /**
@@ -44,6 +46,7 @@ public class CreditCard {
     private CardBrand cardBrand;
 
     @Column(name = "last_four_digits", nullable = false, length = 4)
+    @JdbcTypeCode(SqlTypes.CHAR)
     private String lastFourDigits;
 
     @Column(name = "is_default", columnDefinition = "BOOLEAN DEFAULT false")
