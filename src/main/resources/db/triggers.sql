@@ -1,3 +1,8 @@
+-- =============================================
+-- COMPLETE CORRECTED TRIGGERS FILE
+-- =============================================
+
+-- Function: Automatic user ban policy when 3+ comments deleted
 CREATE OR REPLACE FUNCTION check_user_ban_policy()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -7,6 +12,7 @@ BEGIN
             updated_at = CURRENT_TIMESTAMP
         WHERE id = NEW.id;
         
+        -- notification_type 'Comentario Eliminado' has ID 5
         INSERT INTO user_notification (
             user_id, 
             notification_type_id, 
@@ -15,7 +21,7 @@ BEGIN
             reference_type
         ) VALUES (
             NEW.id,
-            (SELECT id FROM notification_type WHERE name = 'Comentario Eliminado'),
+            5, -- 'Comentario Eliminado'
             'Cuenta Suspendida',
             'Tu cuenta ha sido suspendida por acumulación de comentarios eliminados. Contacta al administrador.',
             'user_ban'
@@ -31,6 +37,7 @@ CREATE TRIGGER trigger_user_ban_policy
     FOR EACH ROW
     EXECUTE FUNCTION check_user_ban_policy();
 
+-- Function: Update deleted comments count when comment is marked as deleted
 CREATE OR REPLACE FUNCTION update_deleted_comments_count()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -43,12 +50,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- comment_status 'Eliminado' has ID 2
 CREATE TRIGGER trigger_deleted_comments_count
     AFTER UPDATE OF comment_status_id ON article_comment
     FOR EACH ROW
-    WHEN (NEW.comment_status_id = (SELECT id FROM comment_status WHERE name = 'Eliminado'))
+    WHEN (NEW.comment_status_id = 2)
     EXECUTE FUNCTION update_deleted_comments_count();
 
+-- Function: Update stock automatically when stock movement is created
 CREATE OR REPLACE FUNCTION update_stock_on_movement()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -89,10 +98,13 @@ CREATE TRIGGER trigger_update_stock
     FOR EACH ROW
     EXECUTE FUNCTION update_stock_on_movement();
 
+-- Function: Send low stock alerts to administrators
 CREATE OR REPLACE FUNCTION check_low_stock_alert()
 RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.stock_quantity <= NEW.min_stock_level THEN
+        -- notification_type 'Stock Bajo' has ID 4
+        -- user_type 'Administrador' has ID 2
         INSERT INTO user_notification (
             user_id, 
             notification_type_id, 
@@ -103,13 +115,13 @@ BEGIN
         ) 
         SELECT 
             u.id,
-            (SELECT id FROM notification_type WHERE name = 'Stock Bajo'),
+            4, -- 'Stock Bajo'
             'Alerta de Stock Bajo',
             CONCAT('El artículo "', NEW.title, '" tiene stock bajo. Stock actual: ', NEW.stock_quantity, ', Mínimo: ', NEW.min_stock_level),
             'article',
             NEW.id
         FROM "user" u 
-        WHERE u.user_type_id = (SELECT id FROM user_type WHERE name = 'Administrador');
+        WHERE u.user_type_id = 2; -- 'Administrador'
     END IF;
     
     RETURN NEW;
@@ -121,6 +133,7 @@ CREATE TRIGGER trigger_low_stock_alert
     FOR EACH ROW
     EXECUTE FUNCTION check_low_stock_alert();
 
+-- Function: Update cart prices when article price changes
 CREATE OR REPLACE FUNCTION update_cart_prices()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -153,6 +166,7 @@ CREATE TRIGGER trigger_update_cart_prices
     FOR EACH ROW
     EXECUTE FUNCTION update_cart_prices();
 
+-- Function: Update cart totals when items are modified
 CREATE OR REPLACE FUNCTION update_cart_totals()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -187,6 +201,7 @@ CREATE TRIGGER trigger_update_cart_totals
     FOR EACH ROW
     EXECUTE FUNCTION update_cart_totals();
 
+-- Function: Update article rating statistics
 CREATE OR REPLACE FUNCTION update_article_rating()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -222,10 +237,12 @@ CREATE TRIGGER trigger_update_article_rating
     FOR EACH ROW
     EXECUTE FUNCTION update_article_rating();
 
+-- Function: Update user statistics when order is delivered
 CREATE OR REPLACE FUNCTION update_user_stats_on_order()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.order_status_id = (SELECT id FROM order_status WHERE name = 'Entregado') THEN
+    -- order_status 'Entregado' has ID 4
+    IF NEW.order_status_id = 4 THEN
         UPDATE "user"
         SET total_spent = total_spent + NEW.total_amount,
             total_orders = total_orders + 1,
@@ -243,18 +260,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- order_status 'Entregado' has ID 4
 CREATE TRIGGER trigger_update_user_stats
     AFTER UPDATE OF order_status_id ON "order"
     FOR EACH ROW
-    WHEN (NEW.order_status_id = (SELECT id FROM order_status WHERE name = 'Entregado'))
+    WHEN (NEW.order_status_id = 4)
     EXECUTE FUNCTION update_user_stats_on_order();
 
+-- Function: Reduce stock when order moves to processing
 CREATE OR REPLACE FUNCTION reduce_stock_on_order()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.order_status_id = (SELECT id FROM order_status WHERE name = 'Procesando') 
-       AND OLD.order_status_id = (SELECT id FROM order_status WHERE name = 'Pendiente') THEN
-        
+    -- order_status: 'Procesando' has ID 2, 'Pendiente' has ID 1
+    IF NEW.order_status_id = 2 AND OLD.order_status_id = 1 THEN
+        -- movement_type 'Salida' has ID 2
+        -- movement_reference_type 'Venta' has ID 2
         INSERT INTO stock_movement (
             analog_article_id,
             movement_type_id,
@@ -266,8 +286,8 @@ BEGIN
         )
         SELECT 
             oi.analog_article_id,
-            (SELECT id FROM movement_type WHERE name = 'Salida'),
-            (SELECT id FROM movement_reference_type WHERE name = 'Venta'),
+            2, -- 'Salida'
+            2, -- 'Venta'
             oi.quantity,
             NEW.id,
             CONCAT('Venta - Orden #', NEW.order_number),
@@ -285,11 +305,12 @@ CREATE TRIGGER trigger_reduce_stock_on_order
     FOR EACH ROW
     EXECUTE FUNCTION reduce_stock_on_order();
 
+-- Function: Notify users when preorder becomes available
 CREATE OR REPLACE FUNCTION notify_preorder_availability()
 RETURNS TRIGGER AS $$
 BEGIN
     IF OLD.is_preorder = true AND NEW.is_preorder = false AND NEW.is_available = true THEN
-        
+        -- notification_type 'Preventa Disponible' has ID 1
         INSERT INTO user_notification (
             user_id,
             notification_type_id,
@@ -300,7 +321,7 @@ BEGIN
         )
         SELECT 
             w.user_id,
-            (SELECT id FROM notification_type WHERE name = 'Preventa Disponible'),
+            1, -- 'Preventa Disponible'
             'Preventa Disponible',
             CONCAT('El artículo "', NEW.title, '" ya está disponible para compra.'),
             'article',
@@ -323,6 +344,7 @@ CREATE TRIGGER trigger_notify_preorder_availability
     FOR EACH ROW
     EXECUTE FUNCTION notify_preorder_availability();
 
+-- Function: Apply cassette discount based on category
 CREATE OR REPLACE FUNCTION apply_cassette_discount()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -356,6 +378,7 @@ CREATE TRIGGER trigger_apply_cassette_discount
     FOR EACH ROW
     EXECUTE FUNCTION apply_cassette_discount();
 
+-- Function: Validate event participants limit
 CREATE OR REPLACE FUNCTION validate_event_participants()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -368,7 +391,7 @@ BEGIN
     WHERE e.id = NEW.event_id;
     
     IF max_participants IS NOT NULL AND current_count >= max_participants THEN
-        RAISE EXCEPTION 'El evento ha alcanzado el máximo de participantes permitidos (%))', max_participants;
+        RAISE EXCEPTION 'El evento ha alcanzado el máximo de participantes permitidos (%)', max_participants;
     END IF;
     
     UPDATE event 
@@ -385,6 +408,7 @@ CREATE TRIGGER trigger_validate_event_participants
     FOR EACH ROW
     EXECUTE FUNCTION validate_event_participants();
 
+-- Function: Decrement event participants when registration is cancelled
 CREATE OR REPLACE FUNCTION decrement_event_participants()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -402,6 +426,7 @@ CREATE TRIGGER trigger_decrement_event_participants
     FOR EACH ROW
     EXECUTE FUNCTION decrement_event_participants();
 
+-- Function: Validate limited edition vinyl stock
 CREATE OR REPLACE FUNCTION validate_limited_vinyl_stock()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -431,6 +456,34 @@ CREATE TRIGGER trigger_validate_limited_vinyl_stock
     FOR EACH ROW
     EXECUTE FUNCTION validate_limited_vinyl_stock();
 
+-- Function: Validate stock movement reference requirements
+CREATE OR REPLACE FUNCTION validate_stock_movement_reference()
+RETURNS TRIGGER AS $$
+DECLARE
+    requires_ref BOOLEAN;
+BEGIN
+    SELECT requires_reference_id INTO requires_ref
+    FROM movement_reference_type 
+    WHERE id = NEW.movement_reference_type_id;
+    
+    IF requires_ref = true AND NEW.reference_id IS NULL THEN
+        RAISE EXCEPTION 'Este tipo de movimiento requiere un ID de referencia';
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_validate_stock_movement_reference
+    BEFORE INSERT OR UPDATE ON stock_movement
+    FOR EACH ROW
+    EXECUTE FUNCTION validate_stock_movement_reference();
+
+-- =============================================
+-- REPORTING FUNCTIONS
+-- =============================================
+
+-- Function: Get sales data grouped by period
 CREATE OR REPLACE FUNCTION get_sales_by_period(
     start_date DATE,
     end_date DATE,
@@ -456,12 +509,13 @@ BEGIN
         SUM(o.total_items)::INTEGER
     FROM "order" o
     WHERE o.created_at::DATE BETWEEN start_date AND end_date
-    AND o.order_status_id = (SELECT id FROM order_status WHERE name = 'Entregado')
+    AND o.order_status_id = 4 -- 'Entregado'
     GROUP BY 1
     ORDER BY 1;
 END;
 $$ LANGUAGE plpgsql;
 
+-- Function: Get top selling articles
 CREATE OR REPLACE FUNCTION get_top_selling_articles(
     period_days INTEGER DEFAULT 30,
     limit_count INTEGER DEFAULT 10
@@ -496,17 +550,25 @@ BEGIN
     LEFT JOIN cd ON aa.id = cd.analog_article_id
     JOIN order_item oi ON aa.id = oi.analog_article_id
     JOIN "order" o ON oi.order_id = o.id
-    WHERE o.created_at >= CURRENT_DATE - INTERVAL '%d days' 
-    AND o.order_status_id = (SELECT id FROM order_status WHERE name = 'Entregado')
+    WHERE o.created_at >= CURRENT_DATE - INTERVAL '1 day' * period_days
+    AND o.order_status_id = 4 -- 'Entregado'
     GROUP BY aa.id, aa.title, ar.name, aa.average_rating, v.id, c.id, cd.id
     ORDER BY total_sold DESC
     LIMIT limit_count;
 END;
 $$ LANGUAGE plpgsql;
 
+-- =============================================
+-- PERFORMANCE INDEXES
+-- =============================================
+
+-- Indexes for improved trigger performance
 CREATE INDEX IF NOT EXISTS idx_user_deleted_comments ON "user"(deleted_comments_count) WHERE deleted_comments_count > 0;
 CREATE INDEX IF NOT EXISTS idx_analog_article_low_stock ON analog_article(id) WHERE stock_quantity <= min_stock_level;
-CREATE INDEX IF NOT EXISTS idx_order_status_delivered ON "order"(created_at) WHERE order_status_id = (SELECT id FROM order_status WHERE name = 'Entregado');
+CREATE INDEX IF NOT EXISTS idx_order_status_delivered ON "order"(created_at) WHERE order_status_id = 4;
 CREATE INDEX IF NOT EXISTS idx_wishlist_item_notification ON wishlist_item(analog_article_id) WHERE notification_sent = false;
 CREATE INDEX IF NOT EXISTS idx_event_participants ON event(current_participants, max_participants);
 CREATE INDEX IF NOT EXISTS idx_vinyl_limited_edition ON vinyl(remaining_limited_stock) WHERE is_limited_edition = true;
+CREATE INDEX IF NOT EXISTS idx_stock_movement_validation ON stock_movement(movement_reference_type_id, reference_id);
+CREATE INDEX IF NOT EXISTS idx_comment_status_deleted ON article_comment(comment_status_id) WHERE comment_status_id = 2;
+CREATE INDEX IF NOT EXISTS idx_order_status_processing ON "order"(order_status_id, user_id) WHERE order_status_id IN (1, 2);
