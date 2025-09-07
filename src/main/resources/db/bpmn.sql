@@ -534,7 +534,7 @@ CREATE TABLE user_preorder_audio_access (
     play_count INTEGER DEFAULT 0,
     downloaded BOOLEAN DEFAULT false,
     downloaded_at TIMESTAMP,
-    PRIMARY KEY (user_id, preorder_audio_id)
+    UNIQUE(user_id, preorder_audio_id)
 );
 
 -- Events
@@ -623,13 +623,7 @@ CREATE TABLE stock_movement (
     reference_id INTEGER,
     notes TEXT,
     created_by_user_id INTEGER REFERENCES "user"(id),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT chk_stock_movement CHECK (
-        (movement_reference_type_id IN (
-            SELECT id FROM movement_reference_type WHERE requires_reference_id = false
-        )) OR 
-        (reference_id IS NOT NULL)
-    )
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- User notifications
@@ -705,7 +699,7 @@ CREATE INDEX idx_notification_type ON user_notification(notification_type_id);
 INSERT INTO currency (code, name, symbol) VALUES 
 ('GTQ', 'Quetzal Guatemalteco', 'Q'),
 ('USD', 'DÃ³lar Estadounidense', '$'),
-('EUR', 'Euro', 'â‚¬');
+('EUR', 'Euro', '€');
 
 -- User types
 INSERT INTO user_type (name, description) VALUES 
@@ -714,22 +708,22 @@ INSERT INTO user_type (name, description) VALUES
 
 -- Gender
 INSERT INTO gender (name, description) VALUES 
-('Masculino', 'GÃ©nero masculino'),
-('Femenino', 'GÃ©nero femenino'),
-('Otro', 'Otro gÃ©nero');
+('Masculino', 'Genero masculino'),
+('Femenino', 'Genero femenino'),
+('Otro', 'Otro genero');
 
 -- Order status
 INSERT INTO order_status (name, description, is_final_status) VALUES 
 ('Pendiente', 'Orden creada pero no procesada', false),
-('Procesando', 'Orden en proceso de preparaciÃ³n', false),
+('Procesando', 'Orden en proceso de preparacion', false),
 ('Enviado', 'Orden enviada al cliente', false),
 ('Entregado', 'Orden entregada exitosamente', true),
 ('Cancelado', 'Orden cancelada', true);
 
 -- Payment methods
 INSERT INTO payment_method (name, description, requires_card) VALUES 
-('Tarjeta de CrÃ©dito', 'Pago con tarjeta de crÃ©dito', true),
-('Tarjeta de DÃ©bito', 'Pago con tarjeta de dÃ©bito', true),
+('Tarjeta de Credito', 'Pago con tarjeta de credito', true),
+('Tarjeta de Debito', 'Pago con tarjeta de debito', true),
 ('Transferencia Bancaria', 'Pago por transferencia bancaria', false);
 
 -- Card brands
@@ -748,13 +742,13 @@ INSERT INTO payment_status (name, description, is_successful) VALUES
 
 -- Vinyl categories
 INSERT INTO vinyl_category (size, description, typical_rpm) VALUES 
-('7 pulgadas', 'Formato pequeÃ±o para sencillos', 45),
+('7 pulgadas', 'Formato pequeño para sencillos', 45),
 ('10 pulgadas', 'Formato medio para EPs', 33),
-('12 pulgadas', 'Formato estÃ¡ndar para LPs', 33);
+('12 pulgadas', 'Formato estandar para LPs', 33);
 
 -- Cassette categories with discounts
 INSERT INTO cassette_category (name, discount_percentage, description) VALUES 
-('Nuevo', 0.00, 'Cassette en condiciÃ³n nueva'),
+('Nuevo', 0.00, 'Cassette en condicion nueva'),
 ('Semi Usado', 20.00, 'Cassette con uso mÃ­nimo'),
 ('Usado', 50.00, 'Cassette con uso considerable');
 
@@ -768,8 +762,8 @@ INSERT INTO side_type (name, description) VALUES
 
 -- CD promotion types
 INSERT INTO cd_promotion_type (name, max_items, discount_percentage, is_time_limited, description) VALUES 
-('Por GÃ©nero', 4, 10.00, true, 'PromociÃ³n de CDs agrupados por gÃ©nero musical'),
-('Aleatorio', 7, 30.00, false, 'PromociÃ³n de CDs agrupados aleatoriamente');
+('Por Genero', 4, 10.00, true, 'Promocion de CDs agrupados por genero musical'),
+('Aleatorio', 7, 30.00, false, 'Promocion de CDs agrupados aleatoriamente');
 
 -- Event status
 INSERT INTO event_status (name, description, allows_registration) VALUES 
@@ -786,60 +780,60 @@ INSERT INTO comment_status (name, description, is_visible) VALUES
 
 -- Movement types
 INSERT INTO movement_type (name, description, affects_stock_increase) VALUES 
-('Entrada', 'Ingreso de mercancÃ­a al inventario', true),
-('Salida', 'Salida de mercancÃ­a del inventario', false),
+('Entrada', 'Ingreso de mercancia al inventario', true),
+('Salida', 'Salida de mercancia del inventario', false),
 ('Ajuste', 'Ajuste de inventario por correcciÃ³n', true);
 
 -- Movement reference types
 INSERT INTO movement_reference_type (name, description, requires_reference_id) VALUES 
 ('Compra', 'Entrada por compra a proveedor', true),
 ('Venta', 'Salida por venta a cliente', true),
-('DaÃ±o', 'Salida por mercancÃ­a daÃ±ada', false),
+('Daño', 'Salida por mercancia dañada', false),
 ('Reconteo', 'Ajuste por reconteo de inventario', false),
-('DevoluciÃ³n', 'Entrada por devoluciÃ³n de cliente', true);
+('Devolucion', 'Entrada por devolucion de cliente', true);
 
 -- Notification types
 INSERT INTO notification_type (name, description, is_email, is_system) VALUES 
-('Preventa Disponible', 'NotificaciÃ³n cuando un artÃ­culo en preventa estÃ¡ disponible', true, true),
-('Evento PrÃ³ximo', 'Recordatorio de evento prÃ³ximo', true, true),
-('Orden Procesada', 'ConfirmaciÃ³n de procesamiento de orden', true, true),
+('Preventa Disponible', 'Notificacion cuando un articulo en preventa esta disponible', true, true),
+('Evento Proximo', 'Recordatorio de evento proximo', true, true),
+('Orden Procesada', 'Confirmacion de procesamiento de orden', true, true),
 ('Stock Bajo', 'Alerta de stock bajo para administradores', true, false),
-('Comentario Eliminado', 'NotificaciÃ³n de comentario eliminado', false, true);
+('Comentario Eliminado', 'Notificacion de comentario eliminado', false, true);
 
 -- Basic music genres
 INSERT INTO music_genre (name, description) VALUES 
-('Rock', 'GÃ©nero musical rock'),
-('Pop', 'GÃ©nero musical pop'),
-('Jazz', 'GÃ©nero musical jazz'),
-('Blues', 'GÃ©nero musical blues'),
-('ClÃ¡sica', 'MÃºsica clÃ¡sica'),
-('ElectrÃ³nica', 'MÃºsica electrÃ³nica'),
-('Hip Hop', 'GÃ©nero hip hop'),
-('Reggae', 'GÃ©nero reggae'),
-('Folk', 'MÃºsica folk'),
-('Metal', 'GÃ©nero metal'),
-('ReggaetÃ³n', 'GÃ©nero reggaetÃ³n'),
-('Salsa', 'GÃ©nero salsa'),
-('Merengue', 'GÃ©nero merengue'),
-('Bachata', 'GÃ©nero bachata');
+('Rock', 'Genero musical rock'),
+('Pop', 'Genero musical pop'),
+('Jazz', 'Genero musical jazz'),
+('Blues', 'Genero musical blues'),
+('Clasica', 'Musica clasica'),
+('Electronica', 'Musica electronica'),
+('Hip Hop', 'Genero hip hop'),
+('Reggae', 'Genero reggae'),
+('Folk', 'Musica folk'),
+('Metal', 'Genero metal'),
+('Reggaeton', 'Genero reggaeton'),
+('Salsa', 'Genero salsa'),
+('Merengue', 'Genero merengue'),
+('Bachata', 'Genero bachata');
 
 -- Basic countries with currencies
 INSERT INTO country (name, country_code, currency_id) VALUES 
 ('Guatemala', 'GT', (SELECT id FROM currency WHERE code = 'GTQ')),
 ('Estados Unidos', 'US', (SELECT id FROM currency WHERE code = 'USD')),
-('MÃ©xico', 'MX', (SELECT id FROM currency WHERE code = 'USD')),
-('EspaÃ±a', 'ES', (SELECT id FROM currency WHERE code = 'EUR')),
+('Mexico', 'MX', (SELECT id FROM currency WHERE code = 'USD')),
+('España', 'ES', (SELECT id FROM currency WHERE code = 'EUR')),
 ('Reino Unido', 'GB', (SELECT id FROM currency WHERE code = 'USD')),
 ('Alemania', 'DE', (SELECT id FROM currency WHERE code = 'EUR')),
 ('Francia', 'FR', (SELECT id FROM currency WHERE code = 'EUR')),
 ('Italia', 'IT', (SELECT id FROM currency WHERE code = 'EUR')),
-('JapÃ³n', 'JP', (SELECT id FROM currency WHERE code = 'USD')),
+('Japon', 'JP', (SELECT id FROM currency WHERE code = 'USD')),
 ('Brasil', 'BR', (SELECT id FROM currency WHERE code = 'USD'));
 
 -- Basic vinyl special editions
 INSERT INTO vinyl_special_edition (name, color, extra_content, is_limited, limited_quantity) VALUES 
-('EdiciÃ³n EstÃ¡ndar', 'Negro', NULL, false, NULL),
-('EdiciÃ³n Transparente', 'Transparente', 'Vinilo transparente', true, 500),
-('EdiciÃ³n Dorada', 'Dorado', 'Vinilo dorado con pÃ³ster', true, 250),
-('EdiciÃ³n de Colores', 'Multicolor', 'Vinilo multicolor salpicado', true, 300),
-('EdiciÃ³n Limitada Blanca', 'Blanco', 'Vinilo blanco con booklet', true, 200);
+('Edicion Estandar', 'Negro', NULL, false, NULL),
+('Edicion Transparente', 'Transparente', 'Vinilo transparente', true, 500),
+('Edicion Dorada', 'Dorado', 'Vinilo dorado con poster', true, 250),
+('Edicion de Colores', 'Multicolor', 'Vinilo multicolor salpicado', true, 300),
+('Edicion Limitada Blanca', 'Blanco', 'Vinilo blanco con booklet', true, 200);
