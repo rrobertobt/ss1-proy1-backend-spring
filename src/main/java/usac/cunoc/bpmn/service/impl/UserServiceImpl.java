@@ -71,17 +71,24 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        // Validate address limit (max 5 addresses per user)
+        long addressCount = userAddressRepository.countByUser(user);
+        if (addressCount >= 5) {
+            throw new RuntimeException("No se pueden agregar más de 5 direcciones por usuario");
+        }
+
         Country country = countryRepository.findById(request.getCountryId())
                 .orElseThrow(() -> new RuntimeException("País no encontrado"));
 
-        // Handle default flags
-        if (Boolean.TRUE.equals(request.getIsDefault())) {
+        // Handle default flags - if this is the first address, make it default
+        boolean isFirstAddress = addressCount == 0;
+        if (isFirstAddress || Boolean.TRUE.equals(request.getIsDefault())) {
             userAddressRepository.clearDefaultFlags(user);
         }
-        if (Boolean.TRUE.equals(request.getIsBillingDefault())) {
+        if (isFirstAddress || Boolean.TRUE.equals(request.getIsBillingDefault())) {
             userAddressRepository.clearBillingDefaultFlags(user);
         }
-        if (Boolean.TRUE.equals(request.getIsShippingDefault())) {
+        if (isFirstAddress || Boolean.TRUE.equals(request.getIsShippingDefault())) {
             userAddressRepository.clearShippingDefaultFlags(user);
         }
 
@@ -93,9 +100,9 @@ public class UserServiceImpl implements UserService {
         address.setState(request.getState());
         address.setPostalCode(request.getPostalCode());
         address.setCountry(country);
-        address.setIsDefault(Boolean.TRUE.equals(request.getIsDefault()));
-        address.setIsBillingDefault(Boolean.TRUE.equals(request.getIsBillingDefault()));
-        address.setIsShippingDefault(Boolean.TRUE.equals(request.getIsShippingDefault()));
+        address.setIsDefault(isFirstAddress || Boolean.TRUE.equals(request.getIsDefault()));
+        address.setIsBillingDefault(isFirstAddress || Boolean.TRUE.equals(request.getIsBillingDefault()));
+        address.setIsShippingDefault(isFirstAddress || Boolean.TRUE.equals(request.getIsShippingDefault()));
 
         UserAddress savedAddress = userAddressRepository.save(address);
         return mapToAddressResponse(savedAddress);
@@ -169,6 +176,15 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        // Validate card limit (max 3 cards per user)
+        long cardCount = creditCardRepository.countByUserAndIsActiveTrue(user);
+        if (cardCount >= 3) {
+            throw new RuntimeException("No se pueden agregar más de 3 tarjetas por usuario");
+        }
+
+        // Validate expiry date
+        validateCardExpiryDate(request.getExpiryMonth(), request.getExpiryYear());
+
         CardBrand cardBrand = cardBrandRepository.findById(request.getCardBrandId())
                 .orElseThrow(() -> new RuntimeException("Marca de tarjeta no encontrada"));
 
@@ -180,8 +196,9 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Ya existe una tarjeta con los mismos últimos 4 dígitos");
         }
 
-        // Handle default flag
-        if (Boolean.TRUE.equals(request.getIsDefault())) {
+        // Handle default flag - if this is the first card, make it default
+        boolean isFirstCard = cardCount == 0;
+        if (isFirstCard || Boolean.TRUE.equals(request.getIsDefault())) {
             creditCardRepository.clearDefaultFlags(user);
         }
 
@@ -195,7 +212,7 @@ public class UserServiceImpl implements UserService {
         creditCard.setCvvEncrypted(encryptionService.encrypt(request.getCvv()));
         creditCard.setCardBrand(cardBrand);
         creditCard.setLastFourDigits(lastFourDigits);
-        creditCard.setIsDefault(Boolean.TRUE.equals(request.getIsDefault()));
+        creditCard.setIsDefault(isFirstCard || Boolean.TRUE.equals(request.getIsDefault()));
 
         CreditCard savedCard = creditCardRepository.save(creditCard);
         return mapToCreditCardResponse(savedCard);
@@ -314,5 +331,28 @@ public class UserServiceImpl implements UserService {
                 encryptionService.decrypt(card.getExpiryMonthEncrypted()),
                 encryptionService.decrypt(card.getExpiryYearEncrypted()),
                 card.getIsDefault(), card.getIsActive(), card.getCreatedAt());
+    }
+
+    private void validateCardExpiryDate(String month, String year) {
+        try {
+            int expiryMonth = Integer.parseInt(month);
+            int expiryYear = Integer.parseInt(year);
+
+            if (expiryMonth < 1 || expiryMonth > 12) {
+                throw new RuntimeException("Mes de expiración inválido");
+            }
+
+            // Check if card is expired
+            java.time.LocalDate now = java.time.LocalDate.now();
+            java.time.LocalDate expiryDate = java.time.LocalDate.of(expiryYear, expiryMonth, 1).plusMonths(1)
+                    .minusDays(1);
+
+            if (expiryDate.isBefore(now)) {
+                throw new RuntimeException("La tarjeta está expirada");
+            }
+
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Fecha de expiración inválida");
+        }
     }
 }
