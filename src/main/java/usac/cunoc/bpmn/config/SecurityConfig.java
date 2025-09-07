@@ -60,8 +60,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/events").permitAll()
                         .requestMatchers("/api/v1/events/{id}").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                        // User endpoints - require authentication
+                        .requestMatchers("/api/v1/users/**").authenticated()
+
                         // Admin endpoints - using exact database value
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMINISTRADOR")
+
                         // All other endpoints require authentication
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
