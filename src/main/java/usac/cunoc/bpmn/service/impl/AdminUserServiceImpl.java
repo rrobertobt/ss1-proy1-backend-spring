@@ -101,10 +101,12 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         // PRIVATE HELPER METHODS
 
+        /**
+         * Get users with complete filters implementation - using existing repository
+         * methods
+         */
         private Page<User> getUsersWithFilters(String search, String userType, String status, Pageable pageable) {
-                // This would typically use Spring Data JPA Specifications or custom queries
-                // For now, implementing basic filtering logic
-
+                // Priority 1: Search filter (highest priority)
                 if (search != null && !search.trim().isEmpty()) {
                         String searchTerm = "%" + search.toLowerCase() + "%";
                         return userRepository
@@ -112,6 +114,30 @@ public class AdminUserServiceImpl implements AdminUserService {
                                                         searchTerm, searchTerm, searchTerm, searchTerm, pageable);
                 }
 
+                // Priority 2: UserType filter - exact match with BD values ("Cliente",
+                // "Administrador")
+                if (userType != null && !userType.trim().isEmpty()) {
+                        return userRepository.findByUserTypeName(userType, pageable);
+                }
+
+                // Priority 3: Status filter - maps to BD boolean fields
+                if (status != null && !status.trim().isEmpty()) {
+                        switch (status.toLowerCase()) {
+                                case "active":
+                                        return userRepository.findByIsActiveAndIsBanned(true, false, pageable);
+                                case "inactive":
+                                        return userRepository.findByIsActiveAndIsBanned(false, false, pageable);
+                                case "banned":
+                                        return userRepository.findByIsActiveAndIsBanned(true, true, pageable);
+                                case "inactive_banned":
+                                        return userRepository.findByIsActiveAndIsBanned(false, true, pageable);
+                                default:
+                                        // Invalid status, return all
+                                        return userRepository.findAll(pageable);
+                        }
+                }
+
+                // No filters: return all users ordered by creation date
                 return userRepository.findAll(pageable);
         }
 
