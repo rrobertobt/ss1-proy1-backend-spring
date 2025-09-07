@@ -13,7 +13,20 @@ import usac.cunoc.bpmn.dto.catalog.ArticleDetailResponseDto;
 import usac.cunoc.bpmn.dto.catalog.CatalogArticlesResponseDto;
 import usac.cunoc.bpmn.dto.common.PaginationDto;
 import usac.cunoc.bpmn.entity.*;
-import usac.cunoc.bpmn.repository.*;
+import usac.cunoc.bpmn.repository.AnalogArticleRepository;
+import usac.cunoc.bpmn.repository.ArtistRepository;
+import usac.cunoc.bpmn.repository.MusicGenreRepository;
+import usac.cunoc.bpmn.repository.CurrencyRepository;
+import usac.cunoc.bpmn.repository.VinylRepository;
+import usac.cunoc.bpmn.repository.VinylCategoryRepository;
+import usac.cunoc.bpmn.repository.VinylSpecialEditionRepository;
+import usac.cunoc.bpmn.repository.CassetteRepository;
+import usac.cunoc.bpmn.repository.CassetteCategoryRepository;
+import usac.cunoc.bpmn.repository.CdRepository;
+import usac.cunoc.bpmn.repository.StockMovementRepository;
+import usac.cunoc.bpmn.repository.MovementTypeRepository;
+import usac.cunoc.bpmn.repository.MovementReferenceTypeRepository;
+import usac.cunoc.bpmn.repository.UserRepository;
 import usac.cunoc.bpmn.service.AdminCatalogService;
 import usac.cunoc.bpmn.service.CatalogService;
 import java.time.LocalDate;
@@ -35,7 +48,10 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     private final MusicGenreRepository musicGenreRepository;
     private final CurrencyRepository currencyRepository;
     private final VinylRepository vinylRepository;
+    private final VinylCategoryRepository vinylCategoryRepository;
+    private final VinylSpecialEditionRepository vinylSpecialEditionRepository;
     private final CassetteRepository cassetteRepository;
+    private final CassetteCategoryRepository cassetteCategoryRepository;
     private final CdRepository cdRepository;
     private final StockMovementRepository stockMovementRepository;
     private final MovementTypeRepository movementTypeRepository;
@@ -266,8 +282,8 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         Vinyl vinyl = new Vinyl();
         vinyl.setAnalogArticle(article);
 
-        // Set default values from catalog data
-        vinyl.setRpm(33); // Default RPM
+        // Set default values
+        vinyl.setRpm(33);
         vinyl.setIsLimitedEdition(false);
 
         if (typeDetails instanceof Map) {
@@ -282,7 +298,33 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
             if (details.containsKey("remainingLimitedStock")) {
                 vinyl.setRemainingLimitedStock((Integer) details.get("remainingLimitedStock"));
             }
-            // Handle category and special edition IDs if provided
+
+            // Handle vinyl category
+            if (details.containsKey("vinylCategoryId")) {
+                Integer categoryId = (Integer) details.get("vinylCategoryId");
+                if (categoryId != null) {
+                    VinylCategory category = vinylCategoryRepository.findById(categoryId)
+                            .orElseThrow(() -> new RuntimeException("Categoría de vinilo no encontrada"));
+                    vinyl.setVinylCategory(category);
+                }
+            }
+
+            // Handle special edition
+            if (details.containsKey("vinylSpecialEditionId")) {
+                Integer specialEditionId = (Integer) details.get("vinylSpecialEditionId");
+                if (specialEditionId != null) {
+                    VinylSpecialEdition specialEdition = vinylSpecialEditionRepository.findById(specialEditionId)
+                            .orElseThrow(() -> new RuntimeException("Edición especial de vinilo no encontrada"));
+                    vinyl.setVinylSpecialEdition(specialEdition);
+                }
+            }
+        }
+
+        // Use default category if none specified
+        if (vinyl.getVinylCategory() == null) {
+            VinylCategory defaultCategory = vinylCategoryRepository.findBySize("12\"")
+                    .orElse(vinylCategoryRepository.findAll().stream().findFirst().orElse(null));
+            vinyl.setVinylCategory(defaultCategory);
         }
 
         vinylRepository.save(vinyl);
@@ -293,7 +335,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     private void createCassetteRecord(AnalogArticle article, Object typeDetails) {
         Cassette cassette = new Cassette();
         cassette.setAnalogArticle(article);
-        cassette.setIsChromeTape(false); // Default
+        cassette.setIsChromeTape(false);
 
         if (typeDetails instanceof Map) {
             Map<String, Object> details = (Map<String, Object>) typeDetails;
@@ -304,7 +346,23 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
             if (details.containsKey("isChromeTape")) {
                 cassette.setIsChromeTape((Boolean) details.get("isChromeTape"));
             }
-            // Handle category ID if provided
+
+            // Handle cassette category
+            if (details.containsKey("cassetteCategoryId")) {
+                Integer categoryId = (Integer) details.get("cassetteCategoryId");
+                if (categoryId != null) {
+                    CassetteCategory category = cassetteCategoryRepository.findById(categoryId)
+                            .orElseThrow(() -> new RuntimeException("Categoría de cassette no encontrada"));
+                    cassette.setCassetteCategory(category);
+                }
+            }
+        }
+
+        // Use default category if none specified
+        if (cassette.getCassetteCategory() == null) {
+            CassetteCategory defaultCategory = cassetteCategoryRepository.findByName("Nuevo")
+                    .orElse(cassetteCategoryRepository.findAll().stream().findFirst().orElse(null));
+            cassette.setCassetteCategory(defaultCategory);
         }
 
         cassetteRepository.save(cassette);
@@ -315,7 +373,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     private void createCdRecord(AnalogArticle article, Object typeDetails) {
         Cd cd = new Cd();
         cd.setAnalogArticle(article);
-        cd.setDiscCount(1); // Default
+        cd.setDiscCount(1);
         cd.setHasBonusContent(false);
         cd.setIsRemastered(false);
 
