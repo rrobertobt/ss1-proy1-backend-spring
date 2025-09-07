@@ -1,5 +1,7 @@
 package usac.cunoc.bpmn.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -46,4 +48,28 @@ public interface UserRepository extends JpaRepository<User, Integer> {
                         "AND u.twoFactorCodeExpires > CURRENT_TIMESTAMP")
         Optional<User> findByEmailAndValidTwoFactorCode(@Param("email") String email,
                         @Param("code") String code);
+
+        /**
+         * Search users by multiple fields for admin panel
+         */
+        @Query("SELECT u FROM User u WHERE " +
+                        "LOWER(u.username) LIKE LOWER(:search) OR " +
+                        "LOWER(u.email) LIKE LOWER(:search) OR " +
+                        "LOWER(u.firstName) LIKE LOWER(:search) OR " +
+                        "LOWER(u.lastName) LIKE LOWER(:search)")
+        Page<User> findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
+                        @Param("search") String search1, @Param("search") String search2,
+                        @Param("search") String search3, @Param("search") String search4,
+                        Pageable pageable);
+
+        /**
+         * Find users by user type
+         */
+        @Query("SELECT u FROM User u WHERE u.userType.name = :userTypeName")
+        Page<User> findByUserTypeName(@Param("userTypeName") String userTypeName, Pageable pageable);
+
+        /**
+         * Find users by status
+         */
+        Page<User> findByIsActiveAndIsBanned(Boolean isActive, Boolean isBanned, Pageable pageable);
 }
