@@ -15,11 +15,8 @@ import java.util.List;
 @Schema(description = "Stock alerts response data")
 public class StockAlertsResponseDto {
 
-    @Schema(description = "List of articles with low stock")
-    private List<StockAlertDto> lowStockAlerts;
-
-    @Schema(description = "List of articles out of stock")
-    private List<StockAlertDto> outOfStockAlerts;
+    @Schema(description = "List of articles with low stock or out of stock")
+    private List<StockAlertDto> alerts;
 
     @Data
     @NoArgsConstructor
@@ -47,7 +44,7 @@ public class StockAlertsResponseDto {
         @Schema(description = "Article image URL", example = "https://example.com/image.jpg")
         private String imageUrl;
 
-        @Schema(description = "Alert severity", example = "low")
-        private String severity; // "low", "out_of_stock"
+        @Schema(description = "Alert severity", example = "low_stock")
+        private String severity; // "low_stock", "out_of_stock"
     }
 }
