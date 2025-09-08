@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import usac.cunoc.bpmn.dto.admin.event.*;
 import usac.cunoc.bpmn.entity.*;
+import usac.cunoc.bpmn.exception.BusinessValidationException;
 import usac.cunoc.bpmn.repository.*;
 import usac.cunoc.bpmn.service.AdminEventService;
 import java.time.LocalDateTime;
@@ -123,8 +124,8 @@ public class AdminEventServiceImpl implements AdminEventService {
         if (request.getMaxParticipants() != null) {
             // Validate that new max is not less than current participants
             if (request.getMaxParticipants() < event.getCurrentParticipants()) {
-                throw new RuntimeException("Cannot set max participants below current participant count: " + 
-                                         event.getCurrentParticipants());
+                throw BusinessValidationException.maxParticipantsBelowCurrent(
+                    request.getMaxParticipants(), event.getCurrentParticipants());
             }
             event.setMaxParticipants(request.getMaxParticipants());
         }

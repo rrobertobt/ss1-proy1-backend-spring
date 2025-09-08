@@ -766,11 +766,12 @@ INSERT INTO cd_promotion_type (name, max_items, discount_percentage, is_time_lim
 ('Aleatorio', 7, 30.00, false, 'Promocion de CDs agrupados aleatoriamente');
 
 -- Event status
-INSERT INTO event_status (name, description, allows_registration) VALUES 
-('Programado', 'Evento programado para fecha futura', true),
-('En Curso', 'Evento actualmente en desarrollo', false),
-('Finalizado', 'Evento completado', false),
-('Cancelado', 'Evento cancelado', false);
+INSERT INTO event_status (name, description, allows_registration, created_at) VALUES
+('Programado', 'Evento programado y disponible para registro', true, CURRENT_TIMESTAMP),
+('En Curso', 'Evento actualmente en progreso', false, CURRENT_TIMESTAMP),
+('Finalizado', 'Evento terminado', false, CURRENT_TIMESTAMP),
+('Cancelado', 'Evento cancelado', false, CURRENT_TIMESTAMP),
+('Lleno', 'Evento que ha alcanzado su capacidad máxima', false, CURRENT_TIMESTAMP);
 
 -- Comment status
 INSERT INTO comment_status (name, description, is_visible) VALUES 

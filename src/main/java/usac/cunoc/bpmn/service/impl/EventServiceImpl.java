@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import usac.cunoc.bpmn.dto.event.*;
 import usac.cunoc.bpmn.entity.*;
+import usac.cunoc.bpmn.exception.EventChatException;
+import usac.cunoc.bpmn.exception.EventNotFoundException;
 import usac.cunoc.bpmn.repository.*;
 import usac.cunoc.bpmn.service.EventService;
 import java.time.LocalDateTime;
@@ -167,15 +169,15 @@ public class EventServiceImpl implements EventService {
 
         // Validate event exists and allows chat
         Event event = eventRepository.findById(eventId)
-            .orElseThrow(() -> new RuntimeException("Event not found"));
+            .orElseThrow(() -> new EventNotFoundException(eventId));
 
         if (!event.getAllowChat()) {
-            throw new RuntimeException("Chat is not allowed for this event");
+            throw EventChatException.chatNotAllowed(eventId);
         }
 
         // Check if user is registered
         if (!eventRegistrationRepository.existsByEventIdAndUserId(eventId, userId)) {
-            throw new RuntimeException("You must be registered for this event to send messages");
+            throw EventChatException.mustBeRegistered(eventId);
         }
 
         // Get user
