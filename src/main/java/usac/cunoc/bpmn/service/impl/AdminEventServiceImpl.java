@@ -12,7 +12,8 @@ import usac.cunoc.bpmn.service.AdminEventService;
 import java.time.LocalDateTime;
 
 /**
- * Admin event service implementation - 100% compliant with PDF specification and database schema
+ * Admin event service implementation - 100% compliant with PDF specification
+ * and database schema
  */
 @Slf4j
 @Service
@@ -31,17 +32,17 @@ public class AdminEventServiceImpl implements AdminEventService {
 
         // Validate admin user exists
         User adminUser = userRepository.findById(adminUserId)
-            .orElseThrow(() -> new RuntimeException("Admin user not found"));
+                .orElseThrow(() -> new RuntimeException("Admin user not found"));
 
         // Get default event status (assuming "Programado" is default)
         EventStatus defaultStatus = eventStatusRepository.findByName("Programado")
-            .orElseThrow(() -> new RuntimeException("Default event status 'Programado' not found"));
+                .orElseThrow(() -> new RuntimeException("Default event status 'Programado' not found"));
 
         // Validate article exists if provided
         AnalogArticle article = null;
         if (request.getArticleId() != null) {
             article = analogArticleRepository.findById(request.getArticleId())
-                .orElseThrow(() -> new RuntimeException("Article not found with ID: " + request.getArticleId()));
+                    .orElseThrow(() -> new RuntimeException("Article not found with ID: " + request.getArticleId()));
         }
 
         // Create new event entity
@@ -66,29 +67,29 @@ public class AdminEventServiceImpl implements AdminEventService {
         log.info("Event created successfully with ID: {}", savedEvent.getId());
 
         return new CreateEventResponseDto(
-            savedEvent.getId(),
-            savedEvent.getTitle(),
-            savedEvent.getDescription(),
-            savedEvent.getAnalogArticle() != null ? savedEvent.getAnalogArticle().getId() : null,
-            savedEvent.getStartDatetime(),
-            savedEvent.getEndDatetime(),
-            savedEvent.getEventStatus().getName(),
-            savedEvent.getCreatedAt()
-        );
+                savedEvent.getId(),
+                savedEvent.getTitle(),
+                savedEvent.getDescription(),
+                savedEvent.getAnalogArticle() != null ? savedEvent.getAnalogArticle().getId() : null,
+                savedEvent.getStartDatetime(),
+                savedEvent.getEndDatetime(),
+                savedEvent.getEventStatus().getName(),
+                savedEvent.getCreatedAt());
     }
 
     @Override
-    public UpdateEventResponseDto updateEvent(Integer eventId, UpdateEventRequestDto request, 
-                                              Integer adminUserId) {
+    public UpdateEventResponseDto updateEvent(Integer eventId, UpdateEventRequestDto request,
+            Integer adminUserId) {
         log.info("Updating event {} by admin user: {}", eventId, adminUserId);
 
         // Validate admin user exists
+        @SuppressWarnings("unused")
         User adminUser = userRepository.findById(adminUserId)
-            .orElseThrow(() -> new RuntimeException("Admin user not found"));
+                .orElseThrow(() -> new RuntimeException("Admin user not found"));
 
         // Find existing event
         Event event = eventRepository.findById(eventId)
-            .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new RuntimeException("Event not found"));
 
         // Update only provided fields
         if (request.getTitle() != null) {
@@ -101,7 +102,7 @@ public class AdminEventServiceImpl implements AdminEventService {
 
         if (request.getArticleId() != null) {
             AnalogArticle article = analogArticleRepository.findById(request.getArticleId())
-                .orElseThrow(() -> new RuntimeException("Article not found with ID: " + request.getArticleId()));
+                    .orElseThrow(() -> new RuntimeException("Article not found with ID: " + request.getArticleId()));
             event.setAnalogArticle(article);
         }
 
@@ -125,7 +126,7 @@ public class AdminEventServiceImpl implements AdminEventService {
             // Validate that new max is not less than current participants
             if (request.getMaxParticipants() < event.getCurrentParticipants()) {
                 throw BusinessValidationException.maxParticipantsBelowCurrent(
-                    request.getMaxParticipants(), event.getCurrentParticipants());
+                        request.getMaxParticipants(), event.getCurrentParticipants());
             }
             event.setMaxParticipants(request.getMaxParticipants());
         }
@@ -142,14 +143,13 @@ public class AdminEventServiceImpl implements AdminEventService {
         log.info("Event {} updated successfully", eventId);
 
         return new UpdateEventResponseDto(
-            savedEvent.getId(),
-            savedEvent.getTitle(),
-            savedEvent.getDescription(),
-            savedEvent.getAnalogArticle() != null ? savedEvent.getAnalogArticle().getId() : null,
-            savedEvent.getStartDatetime(),
-            savedEvent.getEndDatetime(),
-            savedEvent.getEventStatus().getName(),
-            savedEvent.getUpdatedAt()
-        );
+                savedEvent.getId(),
+                savedEvent.getTitle(),
+                savedEvent.getDescription(),
+                savedEvent.getAnalogArticle() != null ? savedEvent.getAnalogArticle().getId() : null,
+                savedEvent.getStartDatetime(),
+                savedEvent.getEndDatetime(),
+                savedEvent.getEventStatus().getName(),
+                savedEvent.getUpdatedAt());
     }
 }

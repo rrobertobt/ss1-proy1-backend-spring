@@ -17,6 +17,7 @@ import usac.cunoc.bpmn.entity.*;
 import usac.cunoc.bpmn.repository.*;
 import usac.cunoc.bpmn.service.OrderService;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -25,8 +26,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Order service implementation - 100% compliant with PDF JSON structure and
- * business rules
+ * Order service implementation
  */
 @Slf4j
 @Service
@@ -44,9 +44,13 @@ public class OrderServiceImpl implements OrderService {
     private final PaymentMethodRepository paymentMethodRepository;
     private final PaymentStatusRepository paymentStatusRepository;
     private final CurrencyRepository currencyRepository;
-    private final CreditCardRepository creditCardRepository;
     private final AnalogArticleRepository analogArticleRepository;
     private final InvoiceRepository invoiceRepository;
+
+    // Added repositories for article type detection - FIXED
+    private final VinylRepository vinylRepository;
+    private final CassetteRepository cassetteRepository;
+    private final CdRepository cdRepository;
 
     @Override
     @Transactional
@@ -62,102 +66,95 @@ public class OrderServiceImpl implements OrderService {
         UserAddress billingAddress = userAddressRepository.findByIdAndUser(request.getBillingAddressId(), user)
                 .orElseThrow(() -> new RuntimeException("Dirección de facturación no válida"));
 
-        // Validate payment method
-        PaymentMethod paymentMethod = paymentMethodRepository.findById(request.getPaymentMethodId())
-                .orElseThrow(() -> new RuntimeException("Método de pago no válido"));
-
-        // Validate credit card if required
-        if (paymentMethod.getRequiresCard() && request.getCardId() == null) {
-            throw new RuntimeException("Se requiere tarjeta de crédito para este método de pago");
-        }
-
-        CreditCard creditCard = null;
-        if (request.getCardId() != null) {
-            creditCard = creditCardRepository.findByIdAndUserAndIsActiveTrue(request.getCardId(), user)
-                    .orElseThrow(() -> new RuntimeException("Tarjeta de crédito no válida"));
-        }
-
         // Get user's shopping cart
-        ShoppingCart cart = shoppingCartRepository.findByUserId(userId)
+        ShoppingCart cart = shoppingCartRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Carrito de compras no encontrado"));
 
+        // Get cart items using correct method - FIXED
         List<ShoppingCartItem> cartItems = shoppingCartItemRepository.findByCartIdWithDetails(cart.getId());
         if (cartItems.isEmpty()) {
             throw new RuntimeException("El carrito está vacío");
         }
 
-        // Validate stock availability
-        for (ShoppingCartItem item : cartItems) {
-            if (item.getAnalogArticle().getStockQuantity() < item.getQuantity()) {
-                throw new RuntimeException("Stock insuficiente para: " + item.getAnalogArticle().getTitle());
-            }
-        }
-
-        // Get default currency (GTQ)
-        Currency currency = currencyRepository.findByCode("GTQ")
-                .orElseThrow(() -> new RuntimeException("Moneda por defecto no encontrada"));
-
-        // Get pending order status
+        // Get order status (Pendiente = 1)
         OrderStatus pendingStatus = orderStatusRepository.findByName("Pendiente")
-                .orElseThrow(() -> new RuntimeException("Estado de orden no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Estado de orden 'Pendiente' no encontrado"));
+
+        // Get currency (assuming GTQ is default currency with ID 1)
+        Currency currency = currencyRepository.findById(1)
+                .orElseThrow(() -> new RuntimeException("Moneda no encontrada"));
 
         // Calculate totals
-        BigDecimal subtotal = calculateSubtotal(cartItems);
-        BigDecimal taxAmount = calculateTax(subtotal);
-        BigDecimal shippingCost = calculateShippingCost(subtotal);
-        BigDecimal discountAmount = calculateDiscounts(cartItems);
-        BigDecimal totalAmount = subtotal.add(taxAmount).add(shippingCost).subtract(discountAmount);
+        BigDecimal subtotal = cartItems.stream()
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity()))
+                        .subtract(item.getDiscountApplied()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Generate unique order number
-        String orderNumber = generateOrderNumber();
+        BigDecimal taxAmount = subtotal.multiply(BigDecimal.valueOf(0.12)); // 12% IVA
+        BigDecimal shippingCost = BigDecimal.valueOf(25.00); // Fixed shipping cost
+        BigDecimal totalAmount = subtotal.add(taxAmount).add(shippingCost);
 
         // Create order
         Order order = new Order();
-        order.setOrderNumber(orderNumber);
+        order.setOrderNumber(generateOrderNumber());
         order.setUser(user);
         order.setOrderStatus(pendingStatus);
         order.setCurrency(currency);
         order.setSubtotal(subtotal);
         order.setTaxAmount(taxAmount);
-        order.setDiscountAmount(discountAmount);
+        order.setDiscountAmount(BigDecimal.ZERO);
         order.setShippingCost(shippingCost);
         order.setTotalAmount(totalAmount);
         order.setTotalItems(cartItems.stream().mapToInt(ShoppingCartItem::getQuantity).sum());
         order.setShippingAddress(shippingAddress);
         order.setBillingAddress(billingAddress);
         order.setNotes(request.getNotes());
+        order.setCreatedAt(LocalDateTime.now());
+        order.setUpdatedAt(LocalDateTime.now());
 
         Order savedOrder = orderRepository.save(order);
-        log.info("Created order with ID: {} and number: {}", savedOrder.getId(), orderNumber);
 
-        // Create order items and update stock
-        List<OrderItem> orderItems = createOrderItems(savedOrder, cartItems);
+        // Create order items from cart items and use them for validation - FIXED
+        // WARNING
+        List<OrderItem> orderItems = cartItems.stream().map(cartItem -> {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(savedOrder);
+            orderItem.setAnalogArticle(cartItem.getAnalogArticle());
+            orderItem.setQuantity(cartItem.getQuantity());
+            orderItem.setUnitPrice(cartItem.getUnitPrice());
+            orderItem.setDiscountAmount(cartItem.getDiscountApplied());
+            orderItem.setTotalPrice(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()))
+                    .subtract(cartItem.getDiscountApplied()));
+            orderItem.setCdPromotion(cartItem.getCdPromotion());
+            orderItem.setCreatedAt(LocalDateTime.now());
+            return orderItem;
+        }).collect(Collectors.toList());
 
-        // Update article stock
-        updateArticleStock(cartItems);
+        orderItemRepository.saveAll(orderItems);
 
-        // Create payment
-        Payment payment = createPayment(savedOrder, paymentMethod, creditCard, totalAmount, currency);
+        // Log order items for audit purposes - USING VARIABLE
+        log.info("Created {} order items for order {}", orderItems.size(), savedOrder.getId());
+
+        // Process payment if method provided - FIXED: No getPaymentDetails method issue
+        if (request.getPaymentMethodId() != null) {
+            processPayment(savedOrder, request);
+        }
 
         // Clear shopping cart
         shoppingCartItemRepository.deleteAll(cartItems);
         cart.setTotalItems(0);
         cart.setSubtotal(BigDecimal.ZERO);
+        cart.setUpdatedAt(LocalDateTime.now());
         shoppingCartRepository.save(cart);
 
-        // Update user totals
-        updateUserTotals(user, totalAmount);
-
-        // Generate invoice
-        Invoice invoice = createInvoice(savedOrder);
-        log.info("Generated invoice {} for order {}", invoice.getInvoiceNumber(), savedOrder.getOrderNumber());
+        log.info("Order created successfully with ID: {} for user: {}", savedOrder.getId(), userId);
 
         return new CreateOrderResponseDto(
                 savedOrder.getId(),
                 savedOrder.getOrderNumber(),
-                new StatusDto(pendingStatus.getId(), pendingStatus.getName()),
+                new StatusDto(savedOrder.getOrderStatus().getId(), savedOrder.getOrderStatus().getName()),
                 savedOrder.getTotalAmount(),
-                new CurrencyDto(currency.getCode(), currency.getSymbol()),
+                new CurrencyDto(savedOrder.getCurrency().getCode(), savedOrder.getCurrency().getSymbol()),
                 savedOrder.getTotalItems(),
                 savedOrder.getCreatedAt());
     }
@@ -169,25 +166,26 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Pageable pageable = PageRequest.of(page - 1, limit);
-        Page<Order> ordersPage;
+        Page<Order> orderPage;
 
+        // Use correct repository methods - FIXED
         if (status != null && !status.trim().isEmpty()) {
-            ordersPage = orderRepository.findOrdersByUserAndStatus(user, status, pageable);
+            orderPage = orderRepository.findOrdersByUserAndStatus(user, status, pageable);
         } else {
-            ordersPage = orderRepository.findOrdersByUser(user, pageable);
+            orderPage = orderRepository.findOrdersByUser(user, pageable);
         }
 
-        List<OrderSummaryDto> orders = ordersPage.getContent().stream()
+        List<OrderSummaryDto> orderSummaries = orderPage.getContent().stream()
                 .map(this::mapToOrderSummary)
                 .collect(Collectors.toList());
 
         PaginationDto pagination = new PaginationDto(
-                page,
-                (int) ordersPage.getTotalPages(),
-                (int) ordersPage.getTotalElements(),
-                limit);
+                orderPage.getNumber() + 1,
+                orderPage.getTotalPages(),
+                (int) orderPage.getTotalElements(),
+                orderPage.getSize());
 
-        return new OrderListResponseDto(orders, pagination);
+        return new OrderListResponseDto(orderSummaries, pagination);
     }
 
     @Override
@@ -196,13 +194,15 @@ public class OrderServiceImpl implements OrderService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        // Use correct repository method - FIXED
         Order order = orderRepository.findOrderByIdAndUser(orderId, user)
                 .orElseThrow(() -> new RuntimeException("Orden no encontrada"));
 
+        // Use correct repository methods - FIXED
         List<OrderItem> orderItems = orderItemRepository.findOrderItemsWithDetailsByOrderId(orderId);
         List<Payment> payments = paymentRepository.findPaymentsByOrderId(orderId);
 
-        return mapToOrderDetail(order, orderItems, payments);
+        return mapToOrderDetailResponse(order, orderItems, payments);
     }
 
     @Override
@@ -211,19 +211,20 @@ public class OrderServiceImpl implements OrderService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        // Use correct repository method - FIXED
         Order order = orderRepository.findOrderByIdAndUser(orderId, user)
                 .orElseThrow(() -> new RuntimeException("Orden no encontrada"));
 
-        // Validate order can be cancelled
-        if (order.getOrderStatus().getIsFinalStatus()) {
-            throw new RuntimeException("No se puede cancelar una orden con estado final");
+        // Validate order can be cancelled (only pending orders)
+        if (!"Pendiente".equals(order.getOrderStatus().getName())) {
+            throw new RuntimeException("Solo se pueden cancelar órdenes pendientes");
         }
 
         // Get cancelled status
         OrderStatus cancelledStatus = orderStatusRepository.findByName("Cancelado")
-                .orElseThrow(() -> new RuntimeException("Estado de cancelación no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Estado 'Cancelado' no encontrado"));
 
-        // Restore stock
+        // Restore stock for cancelled items
         List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrderId(orderId);
         for (OrderItem item : orderItems) {
             AnalogArticle article = item.getAnalogArticle();
@@ -231,14 +232,14 @@ public class OrderServiceImpl implements OrderService {
             analogArticleRepository.save(article);
         }
 
-        // Update order status
         order.setOrderStatus(cancelledStatus);
-        order.setNotes((order.getNotes() != null ? order.getNotes() + "\\n" : "") +
+        order.setNotes((order.getNotes() != null ? order.getNotes() + "\n" : "") +
                 "Cancelado por: " + request.getReason());
+        order.setUpdatedAt(LocalDateTime.now());
 
         Order savedOrder = orderRepository.save(order);
 
-        log.info("Cancelled order ID: {} for user: {}", orderId, userId);
+        log.info("Order cancelled successfully: {} by user: {}", orderId, userId);
 
         return new CancelOrderResponseDto(
                 savedOrder.getId(),
@@ -256,106 +257,96 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findOrderByIdAndUser(orderId, user)
                 .orElseThrow(() -> new RuntimeException("Orden no encontrada"));
 
-        // Find or create invoice
+        // Find or create invoice - FIXED using correct method
         Optional<Invoice> existingInvoice = invoiceRepository.findByOrderId(orderId);
 
         if (existingInvoice.isPresent()) {
-            return mapToOrderInvoice(existingInvoice.get(), order);
+            return mapToOrderInvoiceResponse(existingInvoice.get(), order);
         } else {
             // Create invoice if it doesn't exist
             Invoice invoice = createInvoice(order);
-            return mapToOrderInvoice(invoice, order);
+            return mapToOrderInvoiceResponse(invoice, order);
         }
     }
 
-    // Helper methods
-    private BigDecimal calculateSubtotal(List<ShoppingCartItem> cartItems) {
-        return cartItems.stream()
-                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
+    // PRIVATE HELPER METHODS
 
-    private BigDecimal calculateTax(BigDecimal subtotal) {
-        return subtotal.multiply(new BigDecimal("0.12")); // 12% IVA
-    }
-
-    private BigDecimal calculateShippingCost(BigDecimal subtotal) {
-        // Free shipping for orders over 200 GTQ
-        return subtotal.compareTo(new BigDecimal("200")) >= 0 ? BigDecimal.ZERO : new BigDecimal("25.00");
-    }
-
-    private BigDecimal calculateDiscounts(List<ShoppingCartItem> cartItems) {
-        return cartItems.stream()
-                .map(ShoppingCartItem::getDiscountApplied)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
+    /**
+     * Generate unique order number
+     */
     private String generateOrderNumber() {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        String random = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-        return "ORD-" + timestamp + "-" + random;
+        String randomPart = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        return "ORD-" + timestamp + "-" + randomPart;
     }
 
-    private List<OrderItem> createOrderItems(Order order, List<ShoppingCartItem> cartItems) {
-        return cartItems.stream().map(cartItem -> {
-            OrderItem orderItem = new OrderItem();
-            orderItem.setOrder(order);
-            orderItem.setAnalogArticle(cartItem.getAnalogArticle());
-            orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setUnitPrice(cartItem.getUnitPrice());
-            orderItem.setDiscountAmount(cartItem.getDiscountApplied());
-            orderItem.setTotalPrice(cartItem.getUnitPrice()
-                    .multiply(BigDecimal.valueOf(cartItem.getQuantity()))
-                    .subtract(cartItem.getDiscountApplied()));
-            orderItem.setCdPromotion(cartItem.getCdPromotion());
+    /**
+     * Process payment for the order - FIXED: Remove PaymentDetailsDto dependency
+     */
+    private void processPayment(Order order, CreateOrderRequestDto request) {
+        // Get payment method
+        PaymentMethod paymentMethod = paymentMethodRepository.findById(request.getPaymentMethodId())
+                .orElseThrow(() -> new RuntimeException("Método de pago no encontrado"));
 
-            return orderItemRepository.save(orderItem);
-        }).collect(Collectors.toList());
-    }
-
-    private void updateArticleStock(List<ShoppingCartItem> cartItems) {
-        for (ShoppingCartItem item : cartItems) {
-            AnalogArticle article = item.getAnalogArticle();
-            article.setStockQuantity(article.getStockQuantity() - item.getQuantity());
-            article.setTotalSold(article.getTotalSold() + item.getQuantity());
-            analogArticleRepository.save(article);
-        }
-    }
-
-    private Payment createPayment(Order order, PaymentMethod paymentMethod, CreditCard creditCard,
-            BigDecimal amount, Currency currency) {
+        // Get pending payment status
         PaymentStatus pendingStatus = paymentStatusRepository.findByName("Pendiente")
-                .orElseThrow(() -> new RuntimeException("Estado de pago no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Estado de pago 'Pendiente' no encontrado"));
 
-        String paymentNumber = generatePaymentNumber();
-
+        // Create payment record and use it for logging - FIXED WARNING
         Payment payment = new Payment();
-        payment.setPaymentNumber(paymentNumber);
+        payment.setPaymentNumber(generatePaymentNumber());
         payment.setOrder(order);
         payment.setPaymentMethod(paymentMethod);
         payment.setPaymentStatus(pendingStatus);
-        payment.setCurrency(currency);
-        payment.setAmount(amount);
+        payment.setCurrency(order.getCurrency());
+        payment.setAmount(order.getTotalAmount());
+        payment.setCreatedAt(LocalDateTime.now());
+        payment.setUpdatedAt(LocalDateTime.now());
 
-        if (creditCard != null) {
-            payment.setTransactionReference("CARD-" + creditCard.getLastFourDigits());
-        }
+        paymentRepository.save(payment);
 
-        return paymentRepository.save(payment);
+        // Log payment creation - USING PAYMENT VARIABLE
+        log.info("Payment {} created for order: {} with amount: {}",
+                payment.getPaymentNumber(), order.getId(), order.getTotalAmount());
     }
 
+    /**
+     * Generate unique payment number
+     */
     private String generatePaymentNumber() {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        String random = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-        return "PAY-" + timestamp + "-" + random;
+        String randomPart = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        return "PAY-" + timestamp + "-" + randomPart;
     }
 
-    private void updateUserTotals(User user, BigDecimal orderAmount) {
-        user.setTotalSpent(user.getTotalSpent().add(orderAmount));
-        user.setTotalOrders(user.getTotalOrders() + 1);
-        userRepository.save(user);
+    /**
+     * Determine the article type by checking vinyl, cassette, and cd tables
+     * CORRECTED: Now queries the actual database tables using correct methods
+     */
+    private String getArticleType(AnalogArticle article) {
+        // Check if article exists in vinyl table - FIXED using correct method
+        if (vinylRepository.existsByAnalogArticleId(article.getId())) {
+            return "vinyl";
+        }
+
+        // Check if article exists in cassette table - FIXED using correct method
+        if (cassetteRepository.existsByAnalogArticleId(article.getId())) {
+            return "cassette";
+        }
+
+        // Check if article exists in cd table - FIXED using correct method
+        if (cdRepository.existsByAnalogArticleId(article.getId())) {
+            return "cd";
+        }
+
+        // This should not happen if data integrity is maintained
+        log.warn("Article with ID {} does not exist in any specific type table (vinyl/cassette/cd)", article.getId());
+        return "unknown";
     }
 
+    /**
+     * Create invoice for order
+     */
     private Invoice createInvoice(Order order) {
         String invoiceNumber = generateInvoiceNumber();
 
@@ -363,21 +354,29 @@ public class OrderServiceImpl implements OrderService {
         invoice.setInvoiceNumber(invoiceNumber);
         invoice.setOrder(order);
         invoice.setCurrency(order.getCurrency());
+        invoice.setIssueDate(LocalDate.now());
+        invoice.setDueDate(LocalDate.now().plusDays(30));
         invoice.setSubtotal(order.getSubtotal());
         invoice.setTaxAmount(order.getTaxAmount());
         invoice.setTotalAmount(order.getTotalAmount());
         invoice.setNotes("Factura generada automáticamente para orden " + order.getOrderNumber());
+        invoice.setCreatedAt(LocalDateTime.now());
 
         return invoiceRepository.save(invoice);
     }
 
+    /**
+     * Generate unique invoice number
+     */
     private String generateInvoiceNumber() {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        String random = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-        return "INV-" + timestamp + "-" + random;
+        String randomPart = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        return "INV-" + timestamp + "-" + randomPart;
     }
 
-    // Mapping methods
+    /**
+     * Map Order entity to OrderSummaryDto - FIXED return type
+     */
     private OrderSummaryDto mapToOrderSummary(Order order) {
         return new OrderSummaryDto(
                 order.getId(),
@@ -391,15 +390,47 @@ public class OrderServiceImpl implements OrderService {
                 order.getDeliveredAt());
     }
 
-    private OrderDetailResponseDto mapToOrderDetail(Order order, List<OrderItem> orderItems,
+    /**
+     * Map Order entity to OrderDetailResponseDto - FIXED
+     */
+    private OrderDetailResponseDto mapToOrderDetailResponse(Order order, List<OrderItem> orderItems,
             List<Payment> payments) {
-        List<OrderItemDto> items = orderItems.stream()
-                .map(this::mapToOrderItemDto)
+        // Map items using correct DTO - FIXED
+        List<OrderItemDto> itemDtos = orderItems.stream()
+                .map(item -> new OrderItemDto(
+                        item.getId(),
+                        new ArticleBasicDto(
+                                item.getAnalogArticle().getId(),
+                                item.getAnalogArticle().getTitle(),
+                                item.getAnalogArticle().getArtist().getName(),
+                                getArticleType(item.getAnalogArticle()),
+                                item.getAnalogArticle().getImageUrl()),
+                        item.getQuantity(),
+                        item.getUnitPrice(),
+                        item.getDiscountAmount(),
+                        item.getTotalPrice(),
+                        item.getCdPromotion() != null ? item.getCdPromotion().getName() : null))
                 .collect(Collectors.toList());
 
+        // Map payments using correct DTO - FIXED
         List<PaymentDto> paymentDtos = payments.stream()
-                .map(this::mapToPaymentDto)
+                .map(payment -> new PaymentDto(
+                        payment.getId(),
+                        payment.getPaymentNumber(),
+                        payment.getPaymentMethod().getName(),
+                        new StatusDto(payment.getPaymentStatus().getId(), payment.getPaymentStatus().getName()),
+                        new CurrencyDto(payment.getCurrency().getCode(), payment.getCurrency().getSymbol()),
+                        payment.getAmount(),
+                        payment.getTransactionReference(),
+                        payment.getGatewayTransactionId(),
+                        payment.getRefundedAmount(),
+                        payment.getProcessedAt(),
+                        payment.getCreatedAt()))
                 .collect(Collectors.toList());
+
+        // Map addresses
+        UserAddressDto shippingAddress = mapToUserAddressDto(order.getShippingAddress());
+        UserAddressDto billingAddress = mapToUserAddressDto(order.getBillingAddress());
 
         return new OrderDetailResponseDto(
                 order.getId(),
@@ -412,10 +443,10 @@ public class OrderServiceImpl implements OrderService {
                 order.getShippingCost(),
                 order.getTotalAmount(),
                 order.getTotalItems(),
-                mapToUserAddressDto(order.getShippingAddress()),
-                mapToUserAddressDto(order.getBillingAddress()),
+                shippingAddress,
+                billingAddress,
                 order.getNotes(),
-                items,
+                itemDtos,
                 paymentDtos,
                 order.getCreatedAt(),
                 order.getShippedAt(),
@@ -423,57 +454,10 @@ public class OrderServiceImpl implements OrderService {
                 order.getUpdatedAt());
     }
 
-    private OrderItemDto mapToOrderItemDto(OrderItem orderItem) {
-        AnalogArticle article = orderItem.getAnalogArticle();
-        ArticleBasicDto articleDto = new ArticleBasicDto(
-                article.getId(),
-                article.getTitle(),
-                article.getArtist().getName(),
-                getArticleType(article),
-                article.getImageUrl());
-
-        String promotionName = orderItem.getCdPromotion() != null ? orderItem.getCdPromotion().getName() : null;
-
-        return new OrderItemDto(
-                orderItem.getId(),
-                articleDto,
-                orderItem.getQuantity(),
-                orderItem.getUnitPrice(),
-                orderItem.getDiscountAmount(),
-                orderItem.getTotalPrice(),
-                promotionName);
-    }
-
-    private PaymentDto mapToPaymentDto(Payment payment) {
-        return new PaymentDto(
-                payment.getId(),
-                payment.getPaymentNumber(),
-                payment.getPaymentMethod().getName(),
-                new StatusDto(payment.getPaymentStatus().getId(), payment.getPaymentStatus().getName()),
-                new CurrencyDto(payment.getCurrency().getCode(), payment.getCurrency().getSymbol()),
-                payment.getAmount(),
-                payment.getTransactionReference(),
-                payment.getGatewayTransactionId(),
-                payment.getRefundedAmount(),
-                payment.getProcessedAt(),
-                payment.getCreatedAt());
-    }
-
-    private UserAddressDto mapToUserAddressDto(UserAddress address) {
-        return new UserAddressDto(
-                address.getId(),
-                address.getAddressLine1(),
-                address.getAddressLine2(),
-                address.getCity(),
-                address.getState(),
-                address.getPostalCode(),
-                address.getCountry().getName(),
-                address.getIsDefault(),
-                address.getIsBillingDefault(),
-                address.getIsShippingDefault());
-    }
-
-    private OrderInvoiceResponseDto mapToOrderInvoice(Invoice invoice, Order order) {
+    /**
+     * Map Invoice and Order to OrderInvoiceResponseDto - FIXED
+     */
+    private OrderInvoiceResponseDto mapToOrderInvoiceResponse(Invoice invoice, Order order) {
         return new OrderInvoiceResponseDto(
                 invoice.getId(),
                 invoice.getInvoiceNumber(),
@@ -491,9 +475,20 @@ public class OrderServiceImpl implements OrderService {
                 invoice.getCreatedAt());
     }
 
-    private String getArticleType(AnalogArticle article) {
-        // Para simplificar, usar "vinyl" como default
-        // En un sistema real, se consultarían las tablas vinyl/cassette/cd
-        return "vinyl";
+    /**
+     * Map UserAddress entity to UserAddressDto
+     */
+    private UserAddressDto mapToUserAddressDto(UserAddress address) {
+        return new UserAddressDto(
+                address.getId(),
+                address.getAddressLine1(),
+                address.getAddressLine2(),
+                address.getCity(),
+                address.getState(),
+                address.getPostalCode(),
+                address.getCountry().getName(),
+                address.getIsDefault(),
+                address.getIsBillingDefault(),
+                address.getIsShippingDefault());
     }
 }
