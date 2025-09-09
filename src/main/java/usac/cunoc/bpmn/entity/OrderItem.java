@@ -57,4 +57,11 @@ public class OrderItem {
             this.createdAt = LocalDateTime.now();
         }
     }
+
+    /**
+     * Calculate total price for this item
+     */
+    public BigDecimal getTotalPrice() {
+        return unitPrice.multiply(BigDecimal.valueOf(quantity)).subtract(discountAmount);
+    }
 }
