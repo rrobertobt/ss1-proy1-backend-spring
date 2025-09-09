@@ -15,12 +15,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import usac.cunoc.bpmn.dto.admin.event.*;
 import usac.cunoc.bpmn.dto.common.ApiResponseDto;
-import usac.cunoc.bpmn.entity.User;
 import usac.cunoc.bpmn.repository.UserRepository;
 import usac.cunoc.bpmn.service.AdminEventService;
 
 /**
- * Admin event controller for administrative event operations - matches PDF specification exactly
+ * Admin event controller for administrative event operations - matches PDF
+ * specification exactly
  * Requires ADMIN role for all operations
  */
 @RestController
@@ -30,54 +30,54 @@ import usac.cunoc.bpmn.service.AdminEventService;
 @Tag(name = "Admin Event Management", description = "Administrative event management operations")
 public class AdminEventController {
 
-    private final AdminEventService adminEventService;
-    private final UserRepository userRepository;
+        private final AdminEventService adminEventService;
+        private final UserRepository userRepository;
 
-    @PostMapping
-    @Operation(summary = "Create new event", description = "Create a new event in the system")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Event created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden - Admin access required")
-    })
-    public ResponseEntity<ApiResponseDto<CreateEventResponseDto>> createEvent(
-            @Valid @RequestBody CreateEventRequestDto request,
-            Authentication authentication) {
+        @PostMapping
+        @Operation(summary = "Create new event", description = "Create a new event in the system")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "201", description = "Event created successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                        @ApiResponse(responseCode = "403", description = "Forbidden - Admin access required")
+        })
+        public ResponseEntity<ApiResponseDto<CreateEventResponseDto>> createEvent(
+                        @Valid @RequestBody CreateEventRequestDto request,
+                        Authentication authentication) {
 
-        Integer adminUserId = getCurrentUserId(authentication);
-        CreateEventResponseDto response = adminEventService.createEvent(request, adminUserId);
+                Integer adminUserId = getCurrentUserId(authentication);
+                CreateEventResponseDto response = adminEventService.createEvent(request, adminUserId);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponseDto.success("Evento creado exitosamente", response));
-    }
+                return ResponseEntity.status(HttpStatus.CREATED)
+                                .body(ApiResponseDto.success("Evento creado exitosamente", response));
+        }
 
-    @PutMapping("/{id}")
-    @Operation(summary = "Update event", description = "Update an existing event")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Event updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid input data"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "403", description = "Forbidden - Admin access required"),
-            @ApiResponse(responseCode = "404", description = "Event not found")
-    })
-    public ResponseEntity<ApiResponseDto<UpdateEventResponseDto>> updateEvent(
-            @PathVariable @Parameter(description = "Event ID") Integer id,
-            @Valid @RequestBody UpdateEventRequestDto request,
-            Authentication authentication) {
+        @PutMapping("/{id}")
+        @Operation(summary = "Update event", description = "Update an existing event")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Event updated successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                        @ApiResponse(responseCode = "403", description = "Forbidden - Admin access required"),
+                        @ApiResponse(responseCode = "404", description = "Event not found")
+        })
+        public ResponseEntity<ApiResponseDto<UpdateEventResponseDto>> updateEvent(
+                        @PathVariable @Parameter(description = "Event ID") Integer id,
+                        @Valid @RequestBody UpdateEventRequestDto request,
+                        Authentication authentication) {
 
-        Integer adminUserId = getCurrentUserId(authentication);
-        UpdateEventResponseDto response = adminEventService.updateEvent(id, request, adminUserId);
+                Integer adminUserId = getCurrentUserId(authentication);
+                UpdateEventResponseDto response = adminEventService.updateEvent(id, request, adminUserId);
 
-        return ResponseEntity.ok(ApiResponseDto.success("Evento actualizado exitosamente", response));
-    }
+                return ResponseEntity.ok(ApiResponseDto.success("Evento actualizado exitosamente", response));
+        }
 
-    // PRIVATE HELPER METHODS
+        // PRIVATE HELPER METHODS
 
-    private Integer getCurrentUserId(Authentication authentication) {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return userRepository.findByUsernameOrEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Admin user not found"))
-                .getId();
-    }
+        private Integer getCurrentUserId(Authentication authentication) {
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                return userRepository.findByUsernameOrEmail(userDetails.getUsername())
+                                .orElseThrow(() -> new RuntimeException("Admin user not found"))
+                                .getId();
+        }
 }
