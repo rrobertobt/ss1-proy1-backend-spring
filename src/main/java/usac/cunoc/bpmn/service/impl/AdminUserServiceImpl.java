@@ -9,171 +9,249 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import usac.cunoc.bpmn.dto.admin.*;
+import usac.cunoc.bpmn.entity.ArticleComment;
 import usac.cunoc.bpmn.entity.User;
+import usac.cunoc.bpmn.repository.ArticleCommentRepository;
 import usac.cunoc.bpmn.repository.UserRepository;
 import usac.cunoc.bpmn.service.AdminUserService;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Admin user service implementation - compliant with database schema and PDF
- * specification
+ * Admin user service implementation - FIXED VERSION
+ * Uses only existing UserRepository methods
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AdminUserServiceImpl implements AdminUserService {
 
         private final UserRepository userRepository;
+        private final ArticleCommentRepository articleCommentRepository;
 
         @Override
+        @Transactional(readOnly = true)
         public AdminUserListResponseDto getUsers(Integer page, Integer limit, String search,
                         String userType, String status) {
+
                 // Default pagination values
                 int pageNumber = page != null && page > 0 ? page - 1 : 0;
-                int pageSize = limit != null && limit > 0 ? limit : 10;
+                int pageSize = limit != null && limit > 0 ? Math.min(limit, 100) : 10;
 
-                Pageable pageable = PageRequest.of(pageNumber, pageSize,
-                                Sort.by(Sort.Direction.DESC, "createdAt"));
+                Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-                // Get filtered users using custom query
-                Page<User> userPage = getUsersWithFilters(search, userType, status, pageable);
+                // Get users with filters using ONLY existing methods
+                Page<User> usersPage = getUsersWithFilters(search, userType, status, pageable);
 
-                List<AdminUserListResponseDto.UserSummaryDto> userSummaries = userPage.getContent()
-                                .stream()
+                // Map to DTOs
+                List<AdminUserListResponseDto.UserSummaryDto> users = usersPage.getContent().stream()
                                 .map(this::mapToUserSummary)
                                 .collect(Collectors.toList());
 
+                // Create pagination info
                 AdminUserListResponseDto.PaginationDto pagination = new AdminUserListResponseDto.PaginationDto(
-                                pageNumber + 1, // Convert back to 1-based
-                                userPage.getTotalPages(),
-                                (int) userPage.getTotalElements(),
+                                page != null ? page : 1,
+                                (int) usersPage.getTotalPages(),
+                                (int) usersPage.getTotalElements(),
                                 pageSize);
 
-                return new AdminUserListResponseDto(userSummaries, pagination);
+                log.info("Retrieved {} users with filters - search: {}, userType: {}, status: {}",
+                                users.size(), search, userType, status);
+
+                return new AdminUserListResponseDto(users, pagination);
         }
 
         @Override
+        @Transactional(readOnly = true)
         public AdminUserDetailResponseDto getUserById(Integer userId) {
                 User user = userRepository.findById(userId)
                                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+                log.info("Retrieved user details for user ID: {}", userId);
                 return mapToUserDetail(user);
         }
 
         @Override
-        @Transactional
         public AdminUserDetailResponseDto updateUserStatus(Integer userId, UpdateUserStatusRequestDto request) {
                 User user = userRepository.findById(userId)
                                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
                 // Update status fields
-                user.setIsActive(request.getIsActive());
-                user.setIsBanned(request.getIsBanned());
+                if (request.getIsActive() != null) {
+                        user.setIsActive(request.getIsActive());
+                }
 
-                // Log the change reason if provided
+                if (request.getIsBanned() != null) {
+                        user.setIsBanned(request.getIsBanned());
+                }
+
+                // Log the update for audit purposes
                 if (request.getReason() != null && !request.getReason().trim().isEmpty()) {
                         log.info("User status updated for user ID {}: {} - Reason: {}",
                                         userId, request, request.getReason());
                 }
 
                 User savedUser = userRepository.save(user);
+
+                log.info("User status updated successfully for user ID: {}", userId);
                 return mapToUserDetail(savedUser);
         }
 
         @Override
+        @Transactional(readOnly = true)
         public CommentViolationResponseDto getUserCommentViolations(Integer userId) {
+                log.info("Getting comment violations for user ID: {}", userId);
+
                 User user = userRepository.findById(userId)
                                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-                // Note: This would require a proper ArticleComment repository and entity
-                // For now, returning basic structure with empty violations
-                // In a complete implementation, you would query the article_comment table
-                // for comments where comment_status_id = 2 (Eliminado) and user_id = userId
+                // Get deleted comments for this user using the existing repository method
+                List<ArticleComment> deletedComments = articleCommentRepository.findDeletedCommentsByUserId(userId);
+
+                // Map to violation DTOs
+                List<CommentViolationResponseDto.ViolationDto> violations = deletedComments.stream()
+                                .map(this::mapToViolationDto)
+                                .collect(Collectors.toList());
+
+                log.info("Found {} comment violations for user {}", violations.size(), userId);
 
                 return new CommentViolationResponseDto(
                                 user.getId(),
                                 user.getDeletedCommentsCount(),
-                                List.of() // Empty list - would be populated with actual violations in full
-                                          // implementation
-                );
+                                violations);
         }
 
         // PRIVATE HELPER METHODS
 
         /**
-         * Get users with complete filters implementation - using existing repository
-         * methods
+         * Get users with filters using ONLY existing UserRepository methods
          */
         private Page<User> getUsersWithFilters(String search, String userType, String status, Pageable pageable) {
+
                 // Priority 1: Search filter (highest priority)
                 if (search != null && !search.trim().isEmpty()) {
-                        String searchTerm = "%" + search.toLowerCase() + "%";
                         return userRepository
                                         .findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
-                                                        searchTerm, searchTerm, searchTerm, searchTerm, pageable);
+                                                        search, search, search, search, pageable);
                 }
 
-                // Priority 2: UserType filter - exact match with BD values ("Cliente",
-                // "Administrador")
+                // Priority 2: UserType filter - using existing method
                 if (userType != null && !userType.trim().isEmpty()) {
                         return userRepository.findByUserTypeName(userType, pageable);
                 }
 
-                // Priority 3: Status filter - maps to BD boolean fields
+                // Priority 3: Status filter - using existing method with boolean combinations
                 if (status != null && !status.trim().isEmpty()) {
                         switch (status.toLowerCase()) {
-                                case "active":
+                                case "activo":
                                         return userRepository.findByIsActiveAndIsBanned(true, false, pageable);
-                                case "inactive":
+                                case "inactivo":
                                         return userRepository.findByIsActiveAndIsBanned(false, false, pageable);
-                                case "banned":
-                                        return userRepository.findByIsActiveAndIsBanned(true, true, pageable);
-                                case "inactive_banned":
+                                case "baneado":
                                         return userRepository.findByIsActiveAndIsBanned(false, true, pageable);
                                 default:
-                                        // Invalid status, return all
+                                        // For 'verificado' and other cases, return all users
                                         return userRepository.findAll(pageable);
                         }
                 }
 
-                // No filters: return all users ordered by creation date
+                // Default: All users
                 return userRepository.findAll(pageable);
         }
 
+        /**
+         * Map User entity to UserSummaryDto
+         */
         private AdminUserListResponseDto.UserSummaryDto mapToUserSummary(User user) {
-                AdminUserListResponseDto.UserTypeDto userTypeDto = new AdminUserListResponseDto.UserTypeDto(
-                                user.getUserType().getId(), user.getUserType().getName());
+                AdminUserListResponseDto.UserSummaryDto dto = new AdminUserListResponseDto.UserSummaryDto();
+                dto.setId(user.getId());
+                dto.setUsername(user.getUsername());
+                dto.setEmail(user.getEmail());
+                dto.setFirstName(user.getFirstName());
+                dto.setLastName(user.getLastName());
+                dto.setIsActive(user.getIsActive());
+                dto.setIsBanned(user.getIsBanned());
+                dto.setIsVerified(user.getIsVerified());
+                dto.setTotalSpent(user.getTotalSpent());
+                dto.setTotalOrders(user.getTotalOrders());
+                dto.setDeletedCommentsCount(user.getDeletedCommentsCount());
+                dto.setCreatedAt(user.getCreatedAt());
 
-                return new AdminUserListResponseDto.UserSummaryDto(
-                                user.getId(), user.getUsername(), user.getEmail(),
-                                user.getFirstName(), user.getLastName(), userTypeDto,
-                                user.getIsActive(), user.getIsBanned(), user.getIsVerified(),
-                                user.getTotalSpent(), user.getTotalOrders(),
-                                user.getDeletedCommentsCount(), user.getCreatedAt(),
-                                user.getLastLogin());
-        }
-
-        private AdminUserDetailResponseDto mapToUserDetail(User user) {
-                AdminUserDetailResponseDto.GenderDto genderDto = null;
-                if (user.getGender() != null) {
-                        genderDto = new AdminUserDetailResponseDto.GenderDto(
-                                        user.getGender().getId(), user.getGender().getName());
+                // User type info
+                if (user.getUserType() != null) {
+                        dto.setUserType(new AdminUserListResponseDto.UserTypeDto(
+                                        user.getUserType().getId(),
+                                        user.getUserType().getName()));
                 }
 
-                AdminUserDetailResponseDto.UserTypeDto userTypeDto = new AdminUserDetailResponseDto.UserTypeDto(
-                                user.getUserType().getId(), user.getUserType().getName());
+                return dto;
+        }
 
-                return new AdminUserDetailResponseDto(
-                                user.getId(), user.getUsername(), user.getEmail(),
-                                user.getFirstName(), user.getLastName(), genderDto,
-                                user.getBirthDate(), user.getPhone(), userTypeDto,
-                                user.getIsActive(), user.getIsBanned(), user.getIsVerified(),
-                                user.getIs2faEnabled(), user.getTotalSpent(), user.getTotalOrders(),
-                                user.getDeletedCommentsCount(), user.getFailedLoginAttempts(),
-                                user.getLastLogin(), user.getCreatedAt(),
-                                List.of(), // addresses - would be populated in full implementation
-                                List.of() // orderHistory - would be populated in full implementation
-                );
+        /**
+         * Map User entity to UserDetailDto
+         */
+        private AdminUserDetailResponseDto mapToUserDetail(User user) {
+                AdminUserDetailResponseDto dto = new AdminUserDetailResponseDto();
+                dto.setId(user.getId());
+                dto.setUsername(user.getUsername());
+                dto.setEmail(user.getEmail());
+                dto.setFirstName(user.getFirstName());
+                dto.setLastName(user.getLastName());
+                dto.setBirthDate(user.getBirthDate());
+                dto.setPhone(user.getPhone());
+                dto.setIsActive(user.getIsActive());
+                dto.setIsBanned(user.getIsBanned());
+                dto.setIsVerified(user.getIsVerified());
+                dto.setIs2faEnabled(user.getIs2faEnabled());
+                dto.setTotalSpent(user.getTotalSpent());
+                dto.setTotalOrders(user.getTotalOrders());
+                dto.setDeletedCommentsCount(user.getDeletedCommentsCount());
+                dto.setFailedLoginAttempts(user.getFailedLoginAttempts());
+                dto.setLastLogin(user.getLastLogin());
+                dto.setCreatedAt(user.getCreatedAt());
+
+                // Gender info
+                if (user.getGender() != null) {
+                        dto.setGender(new AdminUserDetailResponseDto.GenderDto(
+                                        user.getGender().getId(),
+                                        user.getGender().getName()));
+                }
+
+                // User type info
+                if (user.getUserType() != null) {
+                        dto.setUserType(new AdminUserDetailResponseDto.UserTypeDto(
+                                        user.getUserType().getId(),
+                                        user.getUserType().getName()));
+                }
+
+                return dto;
+        }
+
+        /**
+         * Map ArticleComment to ViolationDto
+         */
+        private CommentViolationResponseDto.ViolationDto mapToViolationDto(ArticleComment comment) {
+                CommentViolationResponseDto.ViolationDto dto = new CommentViolationResponseDto.ViolationDto();
+
+                dto.setId(comment.getId());
+                dto.setCommentText(comment.getCommentText());
+                dto.setDeletedReason(comment.getDeletedReason());
+                dto.setDeletedAt(comment.getDeletedAt());
+
+                // Article info
+                if (comment.getAnalogArticle() != null) {
+                        dto.setArticleId(comment.getAnalogArticle().getId());
+                        dto.setArticleTitle(comment.getAnalogArticle().getTitle());
+                }
+
+                // Deleted by user info
+                if (comment.getDeletedByUser() != null) {
+                        dto.setDeletedByUser(new CommentViolationResponseDto.DeletedByUserDto(
+                                        comment.getDeletedByUser().getId(),
+                                        comment.getDeletedByUser().getUsername()));
+                }
+
+                return dto;
         }
 }
