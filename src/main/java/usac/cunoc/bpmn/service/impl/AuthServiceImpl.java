@@ -114,7 +114,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public LoginResponseDto login(LoginRequestDto request) {
-        User user = userRepository.findByUsernameOrEmail(request.getLogin())
+        User user = userRepository.findByUsernameOrEmail(request.getUsername())
                 .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
 
         // Validate BD boolean constraints exactly
@@ -138,7 +138,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             // Spring Security authentication
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getLogin(), request.getPassword()));
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
             // Reset failed attempts (BD field failed_login_attempts)
             user.setFailedLoginAttempts(0);
