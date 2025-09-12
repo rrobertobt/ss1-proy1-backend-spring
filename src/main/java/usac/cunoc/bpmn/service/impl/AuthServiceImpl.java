@@ -226,12 +226,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto request) {
         try {
-            String username = jwtUtil.extractUsername(request.getRefreshToken());
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            String email = jwtUtil.extractUsername(request.getRefreshToken());
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
             if (jwtUtil.validateToken(request.getRefreshToken(), userDetails)) {
-                String newAccessToken = jwtUtil.generateToken(userDetails);
-                String newRefreshToken = jwtUtil.generateRefreshToken(userDetails);
+                // Load full user (fetches userType via custom query)
+                User user = userRepository.findByUsernameOrEmail(email)
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+
+                String newAccessToken = jwtUtil.generateToken(user);
+                String newRefreshToken = jwtUtil.generateRefreshToken(user);
 
                 // Return exact PDF JSON structure
                 return new RefreshTokenResponseDto(newAccessToken, newRefreshToken);
@@ -283,9 +287,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private LoginResponseDto generateSuccessLogin(User user) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
-        String accessToken = jwtUtil.generateToken(userDetails);
-        String refreshToken = jwtUtil.generateRefreshToken(userDetails);
+        String accessToken = jwtUtil.generateToken(user);
+        String refreshToken = jwtUtil.generateRefreshToken(user);
 
         // Return exact PDF JSON structure for successful login
         LoginResponseDto.UserInfoDto userInfo = new LoginResponseDto.UserInfoDto(
