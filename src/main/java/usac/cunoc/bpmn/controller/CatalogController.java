@@ -34,7 +34,7 @@ public class CatalogController {
         public ResponseEntity<ApiResponseDto<CatalogArticlesResponseDto>> getArticles(
                         @Parameter(description = "Page number (1-based)", example = "1") @RequestParam(defaultValue = "1") Integer page,
 
-                        @Parameter(description = "Items per page (max 50)", example = "12") @RequestParam(defaultValue = "12") Integer limit,
+                        @Parameter(description = "Items per page (use 0 for all)", example = "12") @RequestParam(defaultValue = "12") Integer limit,
 
                         @Parameter(description = "Search term for title or artist name", example = "Beatles") @RequestParam(required = false) String search,
 

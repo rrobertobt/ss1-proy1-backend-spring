@@ -23,14 +23,14 @@ public interface AnalogArticleRepository extends JpaRepository<AnalogArticle, In
         @Query("SELECT aa FROM AnalogArticle aa " +
                         "LEFT JOIN aa.artist a " +
                         "WHERE aa.isAvailable = true " +
-                        "AND (:search IS NULL OR LOWER(aa.title) LIKE LOWER(CONCAT('%', :search, '%')) " +
-                        "     OR LOWER(a.name) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+                        "AND (:searchLower IS NULL OR LOWER(aa.title) LIKE CONCAT('%', :searchLower, '%') " +
+                        "     OR LOWER(a.name) LIKE CONCAT('%', :searchLower, '%')) " +
                         "AND (:genreId IS NULL OR aa.musicGenre.id = :genreId) " +
                         "AND (:artistId IS NULL OR aa.artist.id = :artistId) " +
                         "AND (:minPrice IS NULL OR aa.price >= :minPrice) " +
                         "AND (:maxPrice IS NULL OR aa.price <= :maxPrice)")
         Page<AnalogArticle> findWithFilters(
-                        @Param("search") String search,
+                        @Param("searchLower") String searchLower,
                         @Param("genreId") Integer genreId,
                         @Param("artistId") Integer artistId,
                         @Param("minPrice") BigDecimal minPrice,
@@ -44,14 +44,14 @@ public interface AnalogArticleRepository extends JpaRepository<AnalogArticle, In
                         "LEFT JOIN aa.artist a " +
                         "WHERE aa.id IN (SELECT v.analogArticle.id FROM Vinyl v) " +
                         "AND aa.isAvailable = true " +
-                        "AND (:search IS NULL OR LOWER(aa.title) LIKE LOWER(CONCAT('%', :search, '%')) " +
-                        "     OR LOWER(a.name) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+                        "AND (:searchLower IS NULL OR LOWER(aa.title) LIKE CONCAT('%', :searchLower, '%') " +
+                        "     OR LOWER(a.name) LIKE CONCAT('%', :searchLower, '%')) " +
                         "AND (:genreId IS NULL OR aa.musicGenre.id = :genreId) " +
                         "AND (:artistId IS NULL OR aa.artist.id = :artistId) " +
                         "AND (:minPrice IS NULL OR aa.price >= :minPrice) " +
                         "AND (:maxPrice IS NULL OR aa.price <= :maxPrice)")
         Page<AnalogArticle> findVinylsWithFilters(
-                        @Param("search") String search,
+                        @Param("searchLower") String searchLower,
                         @Param("genreId") Integer genreId,
                         @Param("artistId") Integer artistId,
                         @Param("minPrice") BigDecimal minPrice,
@@ -65,14 +65,14 @@ public interface AnalogArticleRepository extends JpaRepository<AnalogArticle, In
                         "LEFT JOIN aa.artist a " +
                         "WHERE aa.id IN (SELECT c.analogArticle.id FROM Cassette c) " +
                         "AND aa.isAvailable = true " +
-                        "AND (:search IS NULL OR LOWER(aa.title) LIKE LOWER(CONCAT('%', :search, '%')) " +
-                        "     OR LOWER(a.name) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+                        "AND (:searchLower IS NULL OR LOWER(aa.title) LIKE CONCAT('%', :searchLower, '%') " +
+                        "     OR LOWER(a.name) LIKE CONCAT('%', :searchLower, '%')) " +
                         "AND (:genreId IS NULL OR aa.musicGenre.id = :genreId) " +
                         "AND (:artistId IS NULL OR aa.artist.id = :artistId) " +
                         "AND (:minPrice IS NULL OR aa.price >= :minPrice) " +
                         "AND (:maxPrice IS NULL OR aa.price <= :maxPrice)")
         Page<AnalogArticle> findCassettesWithFilters(
-                        @Param("search") String search,
+                        @Param("searchLower") String searchLower,
                         @Param("genreId") Integer genreId,
                         @Param("artistId") Integer artistId,
                         @Param("minPrice") BigDecimal minPrice,
@@ -86,19 +86,24 @@ public interface AnalogArticleRepository extends JpaRepository<AnalogArticle, In
                         "LEFT JOIN aa.artist a " +
                         "WHERE aa.id IN (SELECT cd.analogArticle.id FROM Cd cd) " +
                         "AND aa.isAvailable = true " +
-                        "AND (:search IS NULL OR LOWER(aa.title) LIKE LOWER(CONCAT('%', :search, '%')) " +
-                        "     OR LOWER(a.name) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+                        "AND (:searchLower IS NULL OR LOWER(aa.title) LIKE CONCAT('%', :searchLower, '%') " +
+                        "     OR LOWER(a.name) LIKE CONCAT('%', :searchLower, '%')) " +
                         "AND (:genreId IS NULL OR aa.musicGenre.id = :genreId) " +
                         "AND (:artistId IS NULL OR aa.artist.id = :artistId) " +
                         "AND (:minPrice IS NULL OR aa.price >= :minPrice) " +
                         "AND (:maxPrice IS NULL OR aa.price <= :maxPrice)")
         Page<AnalogArticle> findCdsWithFilters(
-                        @Param("search") String search,
+                        @Param("searchLower") String searchLower,
                         @Param("genreId") Integer genreId,
                         @Param("artistId") Integer artistId,
                         @Param("minPrice") BigDecimal minPrice,
                         @Param("maxPrice") BigDecimal maxPrice,
                         Pageable pageable);
+
+        /**
+         * Get all available articles (no filters)
+         */
+        Page<AnalogArticle> findByIsAvailableTrue(Pageable pageable);
 
         // ========== EXISTING METHODS (Keep unchanged) ==========
 

@@ -52,18 +52,32 @@ public class CatalogServiceImpl implements CatalogService {
         BigDecimal minPriceValue = parsePrice(minPrice);
         BigDecimal maxPriceValue = parsePrice(maxPrice);
 
-        // Build sort
-        Sort sort = buildSort(sortBy);
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        // Normalize search (pre-lowercase to avoid LOWER() on params in JPQL)
+        String searchLower = (search != null && !search.trim().isEmpty())
+                ? search.trim().toLowerCase()
+                : null;
 
-        // Get articles with filters - FIXED: Now properly uses type filters
+        // Build sort and pagination (limit=0 means "return all")
+        Sort sort = buildSort(sortBy);
+        Pageable pageable = (limit != null && limit == 0)
+                ? Pageable.unpaged()
+                : PageRequest.of(pageNumber, pageSize, sort);
+
+        // Get articles with filters
         Page<AnalogArticle> articlePage;
-        if (type != null && !type.isEmpty()) {
-            articlePage = getArticlesByType(type, search, genreId, artistId,
+
+        // If no filters at all, return all available (simpler, faster)
+        boolean noFilters = (searchLower == null && genreId == null && artistId == null
+                && minPriceValue == null && maxPriceValue == null && (type == null || type.isEmpty()));
+
+        if (noFilters) {
+            articlePage = analogArticleRepository.findByIsAvailableTrue(pageable);
+        } else if (type != null && !type.isEmpty()) {
+            articlePage = getArticlesByType(type, searchLower, genreId, artistId,
                     minPriceValue, maxPriceValue, pageable);
         } else {
             articlePage = analogArticleRepository.findWithFilters(
-                    search, genreId, artistId, minPriceValue, maxPriceValue, pageable);
+                    searchLower, genreId, artistId, minPriceValue, maxPriceValue, pageable);
         }
 
         // Map to DTOs
@@ -181,22 +195,22 @@ public class CatalogServiceImpl implements CatalogService {
     /**
      * FIXED: Get articles filtered by type with all additional filters applied
      */
-    private Page<AnalogArticle> getArticlesByType(String type, String search, Integer genreId,
+    private Page<AnalogArticle> getArticlesByType(String type, String searchLower, Integer genreId,
             Integer artistId, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
         switch (type.toLowerCase()) {
             case "vinyl":
                 return analogArticleRepository.findVinylsWithFilters(
-                        search, genreId, artistId, minPrice, maxPrice, pageable);
+                        searchLower, genreId, artistId, minPrice, maxPrice, pageable);
             case "cassette":
                 return analogArticleRepository.findCassettesWithFilters(
-                        search, genreId, artistId, minPrice, maxPrice, pageable);
+                        searchLower, genreId, artistId, minPrice, maxPrice, pageable);
             case "cd":
                 return analogArticleRepository.findCdsWithFilters(
-                        search, genreId, artistId, minPrice, maxPrice, pageable);
+                        searchLower, genreId, artistId, minPrice, maxPrice, pageable);
             default:
                 log.warn("Unknown article type: {}. Using general filter.", type);
                 return analogArticleRepository.findWithFilters(
-                        search, genreId, artistId, minPrice, maxPrice, pageable);
+                        searchLower, genreId, artistId, minPrice, maxPrice, pageable);
         }
     }
 
@@ -232,6 +246,18 @@ public class CatalogServiceImpl implements CatalogService {
         } catch (NumberFormatException e) {
             log.warn("Invalid price format: {}", priceStr);
             return null;
+        }
+    }
+
+    private BigDecimal toBigDecimal(Object value) {
+        if (value == null) return BigDecimal.ZERO;
+        if (value instanceof BigDecimal) return (BigDecimal) value;
+        if (value instanceof Number) return BigDecimal.valueOf(((Number) value).doubleValue());
+        try {
+            return new BigDecimal(value.toString());
+        } catch (Exception e) {
+            log.warn("Unable to convert value to BigDecimal: {} ({})", value, value.getClass().getName());
+            return BigDecimal.ZERO;
         }
     }
 
@@ -510,11 +536,22 @@ public class CatalogServiceImpl implements CatalogService {
                         artist.getId(), artist.getName()))
                 .collect(Collectors.toList());
 
-        // Get price range
+        // Get price range (defensive against provider-specific shapes)
         Object[] priceRange = analogArticleRepository.findPriceRange();
+        BigDecimal minPrice = BigDecimal.ZERO;
+        BigDecimal maxPrice = BigDecimal.ZERO;
+        if (priceRange != null) {
+            if (priceRange.length == 1 && priceRange[0] instanceof Object[]) {
+                Object[] row = (Object[]) priceRange[0];
+                if (row.length > 0) minPrice = toBigDecimal(row[0]);
+                if (row.length > 1) maxPrice = toBigDecimal(row[1]);
+            } else {
+                if (priceRange.length > 0) minPrice = toBigDecimal(priceRange[0]);
+                if (priceRange.length > 1) maxPrice = toBigDecimal(priceRange[1]);
+            }
+        }
         CatalogArticlesResponseDto.PriceRangeDto priceRangeDto = new CatalogArticlesResponseDto.PriceRangeDto(
-                priceRange[0] != null ? (BigDecimal) priceRange[0] : BigDecimal.ZERO,
-                priceRange[1] != null ? (BigDecimal) priceRange[1] : BigDecimal.ZERO);
+                minPrice, maxPrice);
 
         return new CatalogArticlesResponseDto.FiltersDto(
                 genreFilters, artistFilters, priceRangeDto);
