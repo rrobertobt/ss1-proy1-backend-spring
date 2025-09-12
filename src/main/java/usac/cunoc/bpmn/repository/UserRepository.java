@@ -27,8 +27,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
         /**
          * Find user by username or email for login - exact match
+         * Fetches userType to avoid LazyInitializationException in security context
          */
-        @Query("SELECT u FROM User u WHERE u.username = :login OR u.email = :login")
+        @Query("SELECT u FROM User u JOIN FETCH u.userType WHERE u.username = :login OR u.email = :login")
         Optional<User> findByUsernameOrEmail(@Param("login") String login);
 
         /**

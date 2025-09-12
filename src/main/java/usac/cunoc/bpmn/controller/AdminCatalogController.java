@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import usac.cunoc.bpmn.dto.admin.catalog.*;
@@ -27,6 +28,7 @@ import java.time.LocalDate;
 @RestController
 @RequestMapping("/api/v1/admin/catalog")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMINISTRADOR')")
 @Tag(name = "Admin Catalog Management", description = "Administrative catalog and inventory operations")
 public class AdminCatalogController {
 
