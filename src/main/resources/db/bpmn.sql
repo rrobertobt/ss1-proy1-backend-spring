@@ -224,7 +224,7 @@ CREATE TABLE password_reset_token (
     expires_at TIMESTAMP NOT NULL,
     used BOOLEAN DEFAULT false,
     used_at TIMESTAMP,
-    ip_address INET,
+    ip_address VARCHAR(45),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

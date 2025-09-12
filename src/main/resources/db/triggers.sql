@@ -201,37 +201,38 @@ CREATE TRIGGER trigger_update_cart_totals
     FOR EACH ROW
     EXECUTE FUNCTION update_cart_totals();
 
--- Function: Update article rating statistics
+-- Fixed trigger
 CREATE OR REPLACE FUNCTION update_article_rating()
 RETURNS TRIGGER AS $$
 DECLARE
-    article_id INTEGER;
-    avg_rating DECIMAL(3,2);
-    total_ratings INTEGER;
+    target_article_id INTEGER;
+    calculated_avg_rating DECIMAL(3,2);
+    calculated_total_ratings INTEGER;
 BEGIN
     IF TG_OP = 'DELETE' THEN
-        article_id := OLD.analog_article_id;
+        target_article_id := OLD.analog_article_id;
     ELSE
-        article_id := NEW.analog_article_id;
+        target_article_id := NEW.analog_article_id;
     END IF;
     
     SELECT 
         ROUND(AVG(rating)::DECIMAL, 2),
         COUNT(*)
-    INTO avg_rating, total_ratings
+    INTO calculated_avg_rating, calculated_total_ratings
     FROM article_rating 
-    WHERE analog_article_id = article_id;
+    WHERE analog_article_id = target_article_id;
     
     UPDATE analog_article 
-    SET average_rating = COALESCE(avg_rating, 0.00),
-        total_ratings = COALESCE(total_ratings, 0),
+    SET average_rating = COALESCE(calculated_avg_rating, 0.00),
+        total_ratings = COALESCE(calculated_total_ratings, 0),
         updated_at = CURRENT_TIMESTAMP
-    WHERE id = article_id;
+    WHERE id = target_article_id;
     
     RETURN COALESCE(NEW, OLD);
 END;
 $$ LANGUAGE plpgsql;
 
+-- Trigger creation
 CREATE TRIGGER trigger_update_article_rating
     AFTER INSERT OR UPDATE OR DELETE ON article_rating
     FOR EACH ROW
