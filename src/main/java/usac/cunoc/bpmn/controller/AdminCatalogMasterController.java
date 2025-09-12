@@ -133,8 +133,8 @@ public class AdminCatalogMasterController {
      * Get current user ID from authentication
      */
     private Integer getCurrentUserId(Authentication authentication) {
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
+        String usernameOrEmail = authentication.getName();
+        User user = userRepository.findByUsernameOrEmail(usernameOrEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return user.getId();
     }
