@@ -137,7 +137,7 @@ public class SecurityConfig {
                                                 .authenticated()
 
                                                 // Shopping cart operations
-                                                .requestMatchers("/api/v1/cart/**")
+                                                .requestMatchers("/api/v1/cart", "/api/v1/cart/**")
                                                 .authenticated()
 
                                                 // Order management

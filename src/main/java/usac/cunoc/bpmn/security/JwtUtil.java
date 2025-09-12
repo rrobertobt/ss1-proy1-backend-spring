@@ -33,11 +33,13 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    // For Spring Security we use email as the username; fallback to subject for backward compatibility
+    // For Spring Security we use email as the username; fall back to username claim, then subject (backward compatible)
     public String extractUsername(String token) {
         return extractClaim(token, claims -> {
             Object email = claims.get("email");
             if (email instanceof String) return (String) email;
+            Object username = claims.get("username");
+            if (username instanceof String) return (String) username;
             return claims.getSubject();
         });
     }
