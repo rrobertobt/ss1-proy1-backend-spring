@@ -32,119 +32,121 @@ import usac.cunoc.bpmn.repository.UserRepository;
 @SecurityRequirement(name = "bearerAuth")
 public class CartController {
 
-    private final CartService cartService;
-    private final UserRepository userRepository;
+        private final CartService cartService;
+        private final UserRepository userRepository;
 
-    @Operation(summary = "Get user's shopping cart", description = "Retrieve current user's shopping cart with all items")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cart retrieved successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDto.class))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "User not found")
-    })
-    @GetMapping
-    public ResponseEntity<ApiResponseDto<CartResponseDto>> getCart(
-            @AuthenticationPrincipal UserDetails userDetails) {
+        @Operation(summary = "Get user's shopping cart", description = "Retrieve current user's shopping cart with all items")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Cart retrieved successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDto.class))),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                        @ApiResponse(responseCode = "404", description = "User not found")
+        })
+        @GetMapping
+        public ResponseEntity<ApiResponseDto<CartResponseDto>> getCart(
+                        @AuthenticationPrincipal UserDetails userDetails) {
 
-        Integer userId = getUserIdFromUserDetails(userDetails);
-        CartResponseDto cart = cartService.getCart(userId);
+                Integer userId = getUserIdFromUserDetails(userDetails);
+                CartResponseDto cart = cartService.getCart(userId);
 
-        return ResponseEntity.ok(ApiResponseDto.success(cart));
-    }
+                // Include message in response to match expected format
+                return ResponseEntity.ok(ApiResponseDto.success("Operation completed successfully", cart));
+        }
 
-    @Operation(summary = "Add item to cart", description = "Add an article to the shopping cart")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Item added successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid request or insufficient stock"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "Article not found")
-    })
-    @PostMapping("/items")
-    public ResponseEntity<ApiResponseDto<AddCartItemResponseDto>> addItemToCart(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @Valid @RequestBody AddCartItemRequestDto request) {
+        @Operation(summary = "Add item to cart", description = "Add an article to the shopping cart")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "201", description = "Item added successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDto.class))),
+                        @ApiResponse(responseCode = "400", description = "Invalid request or insufficient stock"),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                        @ApiResponse(responseCode = "404", description = "Article not found")
+        })
+        @PostMapping("/items")
+        public ResponseEntity<ApiResponseDto<AddCartItemResponseDto>> addItemToCart(
+                        @AuthenticationPrincipal UserDetails userDetails,
+                        @Valid @RequestBody AddCartItemRequestDto request) {
 
-        Integer userId = getUserIdFromUserDetails(userDetails);
-        AddCartItemResponseDto response = cartService.addItemToCart(userId, request);
+                Integer userId = getUserIdFromUserDetails(userDetails);
+                AddCartItemResponseDto response = cartService.addItemToCart(userId, request);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponseDto.success("Artículo agregado al carrito exitosamente", response));
-    }
+                return ResponseEntity.status(HttpStatus.CREATED)
+                                .body(ApiResponseDto.success("Artículo agregado al carrito exitosamente", response));
+        }
 
-    @Operation(summary = "Update cart item quantity", description = "Update the quantity of an item in the cart")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Quantity updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid request or insufficient stock"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "Cart item not found")
-    })
-    @PutMapping("/items/{id}")
-    public ResponseEntity<ApiResponseDto<UpdateCartItemResponseDto>> updateCartItemQuantity(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @Parameter(description = "Cart item ID") @PathVariable Integer id,
-            @Valid @RequestBody UpdateCartItemRequestDto request) {
+        @Operation(summary = "Update cart item quantity", description = "Update the quantity of an item in the cart")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Quantity updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDto.class))),
+                        @ApiResponse(responseCode = "400", description = "Invalid request or insufficient stock"),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                        @ApiResponse(responseCode = "404", description = "Cart item not found")
+        })
+        @PutMapping("/items/{id}")
+        public ResponseEntity<ApiResponseDto<UpdateCartItemResponseDto>> updateCartItemQuantity(
+                        @AuthenticationPrincipal UserDetails userDetails,
+                        @Parameter(description = "Cart item ID") @PathVariable Integer id,
+                        @Valid @RequestBody UpdateCartItemRequestDto request) {
 
-        Integer userId = getUserIdFromUserDetails(userDetails);
-        UpdateCartItemResponseDto response = cartService.updateCartItemQuantity(userId, id, request);
+                Integer userId = getUserIdFromUserDetails(userDetails);
+                UpdateCartItemResponseDto response = cartService.updateCartItemQuantity(userId, id, request);
 
-        return ResponseEntity.ok(ApiResponseDto.success("Cantidad actualizada exitosamente", response));
-    }
+                return ResponseEntity.ok(ApiResponseDto.success("Cantidad actualizada exitosamente", response));
+        }
 
-    @Operation(summary = "Remove item from cart", description = "Remove an item from the shopping cart")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Item removed successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDto.class))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "Cart item not found")
-    })
-    @DeleteMapping("/items/{id}")
-    public ResponseEntity<ApiResponseDto<RemoveCartItemResponseDto>> removeItemFromCart(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @Parameter(description = "Cart item ID") @PathVariable Integer id) {
+        @Operation(summary = "Remove item from cart", description = "Remove an item from the shopping cart")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Item removed successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDto.class))),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                        @ApiResponse(responseCode = "404", description = "Cart item not found")
+        })
+        @DeleteMapping("/items/{id}")
+        public ResponseEntity<ApiResponseDto<RemoveCartItemResponseDto>> removeItemFromCart(
+                        @AuthenticationPrincipal UserDetails userDetails,
+                        @Parameter(description = "Cart item ID") @PathVariable Integer id) {
 
-        Integer userId = getUserIdFromUserDetails(userDetails);
-        RemoveCartItemResponseDto response = cartService.removeItemFromCart(userId, id);
+                Integer userId = getUserIdFromUserDetails(userDetails);
+                RemoveCartItemResponseDto response = cartService.removeItemFromCart(userId, id);
 
-        return ResponseEntity.ok(ApiResponseDto.success("Artículo removido del carrito exitosamente", response));
-    }
+                return ResponseEntity
+                                .ok(ApiResponseDto.success("Artículo removido del carrito exitosamente", response));
+        }
 
-    @Operation(summary = "Clear cart", description = "Remove all items from the shopping cart")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Cart cleared successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDto.class))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
-    })
-    @DeleteMapping
-    public ResponseEntity<ApiResponseDto<Void>> clearCart(
-            @AuthenticationPrincipal UserDetails userDetails) {
+        @Operation(summary = "Clear cart", description = "Remove all items from the shopping cart")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Cart cleared successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDto.class))),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized")
+        })
+        @DeleteMapping
+        public ResponseEntity<ApiResponseDto<Void>> clearCart(
+                        @AuthenticationPrincipal UserDetails userDetails) {
 
-        Integer userId = getUserIdFromUserDetails(userDetails);
-        cartService.clearCart(userId);
+                Integer userId = getUserIdFromUserDetails(userDetails);
+                cartService.clearCart(userId);
 
-        return ResponseEntity.ok(ApiResponseDto.success("Carrito vaciado exitosamente"));
-    }
+                return ResponseEntity.ok(ApiResponseDto.success("Carrito vaciado exitosamente"));
+        }
 
-    @Operation(summary = "Apply CD promotion", description = "Apply a CD promotion to selected cart items")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Promotion applied successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid promotion or items"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "Promotion not found")
-    })
-    @PostMapping("/apply-cd-promotion")
-    public ResponseEntity<ApiResponseDto<ApplyPromotionResponseDto>> applyCdPromotion(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @Valid @RequestBody ApplyPromotionRequestDto request) {
+        @Operation(summary = "Apply CD promotion", description = "Apply a CD promotion to selected cart items")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Promotion applied successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponseDto.class))),
+                        @ApiResponse(responseCode = "400", description = "Invalid promotion or items"),
+                        @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                        @ApiResponse(responseCode = "404", description = "Promotion not found")
+        })
+        @PostMapping("/apply-cd-promotion")
+        public ResponseEntity<ApiResponseDto<ApplyPromotionResponseDto>> applyCdPromotion(
+                        @AuthenticationPrincipal UserDetails userDetails,
+                        @Valid @RequestBody ApplyPromotionRequestDto request) {
 
-        Integer userId = getUserIdFromUserDetails(userDetails);
-        ApplyPromotionResponseDto response = cartService.applyCdPromotion(userId, request);
+                Integer userId = getUserIdFromUserDetails(userDetails);
+                ApplyPromotionResponseDto response = cartService.applyCdPromotion(userId, request);
 
-        return ResponseEntity.ok(ApiResponseDto.success("Promoción aplicada exitosamente", response));
-    }
+                return ResponseEntity.ok(ApiResponseDto.success("Promoción aplicada exitosamente", response));
+        }
 
-    /**
-     * Extract user ID from UserDetails
-     */
-    private Integer getUserIdFromUserDetails(UserDetails userDetails) {
-        return userRepository.findByUsernameOrEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"))
-                .getId();
-    }
+        /**
+         * Extract user ID from UserDetails
+         */
+        private Integer getUserIdFromUserDetails(UserDetails userDetails) {
+                return userRepository.findByUsernameOrEmail(userDetails.getUsername())
+                                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"))
+                                .getId();
+        }
 }

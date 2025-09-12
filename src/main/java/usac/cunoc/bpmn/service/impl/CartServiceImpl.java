@@ -253,20 +253,74 @@ public class CartServiceImpl implements CartService {
         return shoppingCartRepository.save(cart);
     }
 
+    /**
+     * Map ShoppingCartItem to CartItemDto with complete information
+     */
     private CartResponseDto.CartItemDto mapToCartItemDto(ShoppingCartItem item) {
-        CartResponseDto.ArticleDto articleDto = new CartResponseDto.ArticleDto(
-                item.getAnalogArticle().getId(),
-                item.getAnalogArticle().getTitle(),
-                item.getAnalogArticle().getArtist().getName(),
-                item.getAnalogArticle().getImageUrl(),
-                determineArticleType(item.getAnalogArticle().getId()));
+        AnalogArticle article = item.getAnalogArticle();
 
+        // Create artist DTO with id and name (not just string)
+        CartResponseDto.ArtistDto artistDto = new CartResponseDto.ArtistDto(
+                article.getArtist().getId(),
+                article.getArtist().getName());
+
+        // Create currency DTO
+        CartResponseDto.CurrencyDto currencyDto = new CartResponseDto.CurrencyDto(
+                article.getCurrency().getCode(),
+                article.getCurrency().getSymbol());
+
+        // Create complete article DTO with all required fields
+        CartResponseDto.ArticleDto articleDto = new CartResponseDto.ArticleDto(
+                article.getId(),
+                article.getTitle(),
+                artistDto, // Artist as object, not string
+                determineArticleType(article.getId()),
+                article.getPrice(), // Add price
+                currencyDto, // Add currency
+                article.getImageUrl(),
+                article.getIsAvailable(), // Add availability
+                article.getIsPreorder(), // Add preorder status
+                article.getStockQuantity()); // Add stock quantity
+
+        // Create complete promotion DTO if promotion exists
         CartResponseDto.PromotionDto promotionDto = null;
         if (item.getCdPromotion() != null) {
+            CdPromotion promotion = item.getCdPromotion();
+
+            // Create promotion type DTO
+            CartResponseDto.PromotionTypeDto promotionTypeDto = new CartResponseDto.PromotionTypeDto(
+                    promotion.getCdPromotionType().getId(),
+                    promotion.getCdPromotionType().getName());
+
+            // Create genre DTO (if exists)
+            CartResponseDto.GenreDto genreDto = null;
+            if (promotion.getMusicGenre() != null) {
+                genreDto = new CartResponseDto.GenreDto(
+                        promotion.getMusicGenre().getId(),
+                        promotion.getMusicGenre().getName(),
+                        promotion.getMusicGenre().getDescription());
+            }
+
+            // Get eligible articles for this promotion
+            List<CartResponseDto.EligibleArticleDto> eligibleArticles = getEligibleArticlesForPromotion(
+                    promotion.getId());
+
+            // Format dates for ISO string format
+            String startDate = promotion.getStartDate() != null ? promotion.getStartDate().toString() + "Z" : null;
+            String endDate = promotion.getEndDate() != null ? promotion.getEndDate().toString() + "Z" : null;
+
             promotionDto = new CartResponseDto.PromotionDto(
-                    item.getCdPromotion().getId(),
-                    item.getCdPromotion().getName(),
-                    item.getCdPromotion().getDiscountPercentage());
+                    promotion.getId(),
+                    promotion.getName(),
+                    promotionTypeDto,
+                    genreDto,
+                    promotion.getDiscountPercentage(),
+                    promotion.getCdPromotionType().getMaxItems(),
+                    startDate,
+                    endDate,
+                    promotion.getIsActive(),
+                    promotion.getUsageCount(),
+                    eligibleArticles);
         }
 
         return new CartResponseDto.CartItemDto(
@@ -277,6 +331,16 @@ public class CartServiceImpl implements CartService {
                 item.getDiscountApplied(),
                 item.getTotalPrice(),
                 promotionDto);
+    }
+
+    /**
+     * Get eligible articles for a promotion
+     */
+    private List<CartResponseDto.EligibleArticleDto> getEligibleArticlesForPromotion(Integer promotionId) {
+        // This would require accessing the promotion-article relationship
+        // For now, return empty list or implement based on your promotion-article
+        // junction table
+        return new ArrayList<>();
     }
 
     private String determineArticleType(Integer articleId) {
