@@ -24,10 +24,11 @@ import usac.cunoc.bpmn.security.JwtRequestFilter;
  * Enhanced Security configuration for BPMN API
  * Based on complete analysis of implemented controllers and business
  * requirements
+ * Updated to include AWS S3 file upload endpoints
  * 
  * ROLES SUPPORTED:
  * - CLIENTE: Regular users who can browse, purchase, rate, comment
- * - ADMINISTRADOR: Admin users with full system access
+ * - ADMINISTRADOR: Admin users with full system access including file uploads
  * 
  * SECURITY LAYERS:
  * 1. Public endpoints: No authentication required
@@ -75,7 +76,8 @@ public class SecurityConfig {
 
         /**
          * Main security filter chain with comprehensive endpoint protection
-         * Based on complete analysis of all implemented controllers
+         * Based on complete analysis of all implemented controllers including file
+         * upload system
          */
         @Bean
         public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -87,134 +89,118 @@ public class SecurityConfig {
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(authz -> authz
-
-                                                // =============================================
-                                                // PUBLIC ENDPOINTS (No authentication required)
-                                                // =============================================
-
-                                                // Authentication endpoints - must be public for login/register
+                                                // ============ PUBLIC ENDPOINTS ============
+                                                // No authentication required
                                                 .requestMatchers(
-                                                                "/api/v1/auth/register",
-                                                                "/api/v1/auth/login",
-                                                                "/api/v1/auth/verify-email",
-                                                                "/api/v1/auth/verify-2fa",
-                                                                "/api/v1/auth/forgot-password",
-                                                                "/api/v1/auth/reset-password",
-                                                                "/api/v1/auth/refresh-token")
-                                                .permitAll()
-
-                                                // Public catalog browsing (customer-facing)
-                                                .requestMatchers(
-                                                                "/api/v1/catalog/**", // All catalog browsing endpoints
-                                                                "/api/v1/catalogs/**") // Master data (genres, artists)
-                                                .permitAll()
-
-                                                // Public event viewing (but not registration)
-                                                .requestMatchers(
-                                                                "/api/v1/events", // List events
-                                                                "/api/v1/events/{id}") // View event details
-                                                .permitAll()
-
-                                                // Documentation and monitoring
-                                                .requestMatchers(
+                                                                // Swagger/OpenAPI Documentation
                                                                 "/swagger-ui/**",
-                                                                "/api-docs/**",
-                                                                "/v3/api-docs/**",
                                                                 "/swagger-ui.html",
-                                                                "/swagger-resources/**",
-                                                                "/webjars/**",
-                                                                "/actuator/health",
-                                                                "/actuator/info",
-                                                                "/error")
+                                                                "/v3/api-docs/**",
+                                                                "/api-docs/**",
+                                                                "/actuator/**",
+
+                                                                // Authentication endpoints
+                                                                "/api/v1/auth/**",
+
+                                                                // Public catalog browsing
+                                                                "/api/v1/catalog/**",
+
+                                                                // Public artist and genre information
+                                                                "/api/v1/catalogs/artists",
+                                                                "/api/v1/catalogs/genres",
+                                                                "/api/v1/catalogs/currencies",
+                                                                "/api/v1/catalogs/countries",
+
+                                                                // Public content access
+                                                                "/api/v1/presales/public/**",
+                                                                "/api/v1/events/public/**")
                                                 .permitAll()
 
-                                                // =============================================
-                                                // AUTHENTICATED USER ENDPOINTS
-                                                // =============================================
-                                                // These endpoints require valid JWT but work for any authenticated user
-
-                                                // User profile management
-                                                .requestMatchers("/api/v1/users/**")
-                                                .authenticated()
-
-                                                // Shopping cart operations
-                                                .requestMatchers("/api/v1/cart", "/api/v1/cart/**")
-                                                .authenticated()
-
-                                                // Order management
-                                                .requestMatchers("/api/v1/orders/**")
-                                                .authenticated()
-
-                                                // Wishlist operations
-                                                .requestMatchers("/api/v1/wishlist/**")
-                                                .authenticated()
-
-                                                // Article ratings and reviews
-                                                .requestMatchers("/api/v1/articles/*/ratings/**")
-                                                .authenticated()
-
-                                                // Event registration and participation
+                                                // ============ ADMIN-ONLY ENDPOINTS ============
+                                                // Administrative functions requiring ADMIN role
                                                 .requestMatchers(
-                                                                "/api/v1/events/*/register",
-                                                                "/api/v1/events/*/unregister",
-                                                                "/api/v1/events/*/participants",
-                                                                "/api/v1/events/*/chat/**")
+                                                                // Admin catalog management
+                                                                "/api/v1/admin/catalog/**",
+                                                                "/api/v1/admin/catalogs/**",
+
+                                                                // File upload system - NEW ENDPOINTS
+                                                                "/api/v1/admin/upload-url",
+                                                                "/api/v1/admin/upload/validate/**",
+
+                                                                // Admin user management
+                                                                "/api/v1/admin/users/**",
+
+                                                                // Admin reports and analytics
+                                                                "/api/v1/admin/reports/**",
+
+                                                                // Admin promotion management
+                                                                "/api/v1/admin/promotions/**",
+
+                                                                // Admin presales management
+                                                                "/api/v1/admin/presales/**",
+
+                                                                // Admin event management
+                                                                "/api/v1/admin/events/**",
+
+                                                                // Admin order management
+                                                                "/api/v1/admin/orders/**",
+
+                                                                // Admin notification management
+                                                                "/api/v1/admin/notifications/**")
+                                                .hasRole("ADMINISTRADOR")
+
+                                                // ============ CLIENT ENDPOINTS ============
+                                                // Regular user functions requiring authentication
+                                                .requestMatchers(
+                                                                // User profile management
+                                                                "/api/v1/users/**",
+
+                                                                // Shopping cart operations
+                                                                "/api/v1/cart/**",
+
+                                                                // Order placement and tracking
+                                                                "/api/v1/orders/**",
+
+                                                                // Wishlist management
+                                                                "/api/v1/wishlist/**",
+
+                                                                // User notifications
+                                                                "/api/v1/notifications/**",
+
+                                                                // Event participation
+                                                                "/api/v1/events/register/**",
+                                                                "/api/v1/events/unregister/**",
+                                                                "/api/v1/events/my-registrations",
+
+                                                                // Presales participation
+                                                                "/api/v1/presales/register/**",
+                                                                "/api/v1/presales/my-registrations",
+
+                                                                // User comments and ratings
+                                                                "/api/v1/catalog/articles/*/comments",
+                                                                "/api/v1/catalog/articles/*/ratings",
+
+                                                                // Purchase history
+                                                                "/api/v1/users/orders/**",
+                                                                "/api/v1/users/purchases/**")
+                                                .hasAnyRole("CLIENTE", "ADMINISTRADOR")
+
+                                                // ============ SPECIAL ENDPOINTS ============
+                                                // Two-factor authentication (authenticated users only)
+                                                .requestMatchers(
+                                                                "/api/v1/auth/2fa/**")
                                                 .authenticated()
 
-                                                // User notifications
-                                                .requestMatchers("/api/v1/notifications/**")
-                                                .authenticated()
+                                                // Password reset confirmation (public but with token validation)
+                                                .requestMatchers(
+                                                                "/api/v1/auth/reset-password/confirm/**")
+                                                .permitAll()
 
-                                                // Preorder audio access
-                                                .requestMatchers("/api/v1/preorder-audios/**")
-                                                .authenticated()
+                                                // All other requests require authentication
+                                                .anyRequest().authenticated());
 
-                                                // =============================================
-                                                // ADMINISTRATOR-ONLY ENDPOINTS
-                                                // =============================================
-                                                // These endpoints require ADMINISTRADOR role
-
-                                                // Admin catalog management
-                                                .requestMatchers("/api/v1/admin/catalog/**")
-                                                .hasRole("ADMINISTRADOR")
-
-                                                // Admin catalog master data management
-                                                .requestMatchers("/api/v1/admin/catalogs/**")
-                                                .hasRole("ADMINISTRADOR")
-
-                                                // Admin event management
-                                                .requestMatchers("/api/v1/admin/events/**")
-                                                .hasRole("ADMINISTRADOR")
-
-                                                // Admin promotion management
-                                                .requestMatchers("/api/v1/admin/promotions/**")
-                                                .hasRole("ADMINISTRADOR")
-
-                                                // Admin user management
-                                                .requestMatchers("/api/v1/admin/users/**")
-                                                .hasRole("ADMINISTRADOR")
-
-                                                // Admin reports and analytics
-                                                .requestMatchers("/api/v1/admin/reports/**")
-                                                .hasRole("ADMINISTRADOR")
-
-                                                // Admin stock and inventory management
-                                                .requestMatchers("/api/v1/admin/stock/**")
-                                                .hasRole("ADMINISTRADOR")
-
-                                                // All other admin endpoints
-                                                .requestMatchers("/api/v1/admin/**")
-                                                .hasRole("ADMINISTRADOR")
-
-                                                // =============================================
-                                                // FALLBACK SECURITY
-                                                // =============================================
-                                                // All other endpoints require authentication
-                                                .anyRequest().authenticated())
-
-                                // Set authentication provider and JWT filter
-                                .authenticationProvider(authenticationProvider())
-                                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                // Add JWT authentication filter
+                http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();
         }
