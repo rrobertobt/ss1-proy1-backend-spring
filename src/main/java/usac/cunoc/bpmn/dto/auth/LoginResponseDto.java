@@ -15,16 +15,16 @@ import lombok.NoArgsConstructor;
 public class LoginResponseDto {
 
     @Schema(description = "JWT access token")
-    private String accessToken;
+    private String access_token;
 
     @Schema(description = "JWT refresh token")
-    private String refreshToken;
+    private String refresh_token;
 
     @Schema(description = "User information")
     private UserInfoDto user;
 
     @Schema(description = "Whether 2FA is required", example = "false")
-    private Boolean requires2fa;
+    private Boolean requires_2fa;
 
     @Data
     @NoArgsConstructor
@@ -41,15 +41,15 @@ public class LoginResponseDto {
         private String email;
 
         @Schema(description = "First name", example = "John")
-        private String firstName;
+        private String first_name;
 
         @Schema(description = "Last name", example = "Doe")
-        private String lastName;
+        private String last_name;
 
         @Schema(description = "User type", example = "Cliente")
-        private String userType;
+        private String user_type;
 
         @Schema(description = "Whether 2FA is enabled", example = "false")
-        private Boolean is2faEnabled;
+        private Boolean is_2fa_enabled;
     }
 }

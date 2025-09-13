@@ -17,10 +17,10 @@ import java.util.List;
 public class CommentViolationResponseDto {
 
     @Schema(description = "User ID", example = "1")
-    private Integer userId;
+    private Integer user_id;
 
     @Schema(description = "Number of deleted comments", example = "2")
-    private Integer deletedCommentsCount;
+    private Integer deleted_comments_count;
 
     @Schema(description = "List of comment violations")
     private List<ViolationDto> violations;
@@ -34,29 +34,29 @@ public class CommentViolationResponseDto {
         private Integer id;
 
         @Schema(description = "Article ID", example = "5")
-        private Integer articleId;
+        private Integer article_id;
 
         @Schema(description = "Article title", example = "Dark Side of the Moon")
-        private String articleTitle;
+        private String article_title;
 
         @Schema(description = "Comment text", example = "This is inappropriate content")
-        private String commentText;
+        private String comment_text;
 
         @Schema(description = "Reason for deletion", example = "Contenido inapropiado")
-        private String deletedReason;
+        private String deleted_reason;
 
         @Schema(description = "When comment was deleted")
-        private LocalDateTime deletedAt;
+        private LocalDateTime deleted_at;
 
         @Schema(description = "User who deleted the comment")
-        private DeletedByUserDto deletedByUser;
+        private deleted_by_userDto deleted_by_user;
     }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @Schema(description = "User who deleted the comment")
-    public static class DeletedByUserDto {
+    public static class deleted_by_userDto {
         @Schema(description = "Admin user ID", example = "2")
         private Integer id;
 

@@ -27,5 +27,5 @@ public class ArticleBasicDto {
     private String type;
 
     @Schema(description = "Image URL", example = "https://example.com/images/abbey-road.jpg")
-    private String imageUrl;
+    private String image_url;
 }

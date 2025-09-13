@@ -24,7 +24,7 @@ public class StockAlertsResponseDto {
     @Schema(description = "Stock alert information")
     public static class StockAlertDto {
         @Schema(description = "Article ID", example = "1")
-        private Integer articleId;
+        private Integer article_id;
 
         @Schema(description = "Article title", example = "Abbey Road")
         private String title;
@@ -36,13 +36,13 @@ public class StockAlertsResponseDto {
         private String type;
 
         @Schema(description = "Current stock quantity", example = "3")
-        private Integer currentStock;
+        private Integer current_stock;
 
         @Schema(description = "Minimum stock level", example = "5")
-        private Integer minStockLevel;
+        private Integer min_stock_level;
 
         @Schema(description = "Article image URL", example = "https://example.com/image.jpg")
-        private String imageUrl;
+        private String image_url;
 
         @Schema(description = "Alert severity", example = "low_stock")
         private String severity; // "low_stock", "out_of_stock"

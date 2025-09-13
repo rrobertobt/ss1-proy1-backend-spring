@@ -21,7 +21,7 @@ public class NotificationListResponseDto {
     private List<NotificationDto> notifications;
 
     @Schema(description = "Count of unread notifications", example = "5")
-    private Integer unreadCount;
+    private Integer unread_count;
 
     @Schema(description = "Pagination information")
     private PaginationDto pagination;
@@ -44,22 +44,22 @@ public class NotificationListResponseDto {
         private String message;
 
         @Schema(description = "Reference type", example = "order")
-        private String referenceType;
+        private String reference_type;
 
         @Schema(description = "Reference ID", example = "123")
-        private Integer referenceId;
+        private Integer reference_id;
 
         @Schema(description = "Whether notification is read", example = "false")
-        private Boolean isRead;
+        private Boolean is_read;
 
         @Schema(description = "Whether email was sent", example = "true")
-        private Boolean isEmailSent;
+        private Boolean is_email_sent;
 
         @Schema(description = "Notification creation date")
-        private LocalDateTime createdAt;
+        private LocalDateTime created_at;
 
         @Schema(description = "Notification read date")
-        private LocalDateTime readAt;
+        private LocalDateTime read_at;
     }
 
     @Data

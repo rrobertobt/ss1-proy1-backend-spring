@@ -64,15 +64,15 @@ public class AuthServiceImpl implements AuthService {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setBirthDate(request.getBirthDate());
+        user.setFirstName(request.getFirst_name());
+        user.setLastName(request.getLast_name());
+        user.setBirthDate(request.getBirth_date());
         user.setPhone(request.getPhone());
         user.setUserType(clientUserType);
 
         // Set gender if provided (FK to gender table)
-        if (request.getGenderId() != null) {
-            user.setGender(genderRepository.findById(request.getGenderId())
+        if (request.getGender_id() != null) {
+            user.setGender(genderRepository.findById(request.getGender_id())
                     .orElseThrow(() -> new RuntimeException("Gender not found")));
         }
 
@@ -98,7 +98,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public VerifyEmailResponseDto verifyEmail(VerifyEmailRequestDto request) {
-        User user = userRepository.findByEmailAndValidTwoFactorCode(request.getEmail(), request.getVerificationCode())
+        User user = userRepository.findByEmailAndValidTwoFactorCode(request.getEmail(), request.getVerification_code())
                 .orElseThrow(() -> new RuntimeException("Invalid verification code or code expired"));
 
         // Update BD fields exactly as schema defines
@@ -212,7 +212,7 @@ public class AuthServiceImpl implements AuthService {
         User user = resetToken.getUser();
 
         // Update password and reset security fields
-        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        user.setPasswordHash(passwordEncoder.encode(request.getNew_password()));
         user.setFailedLoginAttempts(0);
         user.setLockedUntil(null);
         userRepository.save(user);
@@ -224,12 +224,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto request) {
+    public refreshTokenResponseDto refreshToken(refreshTokenRequestDto request) {
         try {
-            String email = jwtUtil.extractUsername(request.getRefreshToken());
+            String email = jwtUtil.extractUsername(request.getRefresh_token());
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-            if (jwtUtil.validateToken(request.getRefreshToken(), userDetails)) {
+            if (jwtUtil.validateToken(request.getRefresh_token(), userDetails)) {
                 // Load full user (fetches userType via custom query)
                 User user = userRepository.findByUsernameOrEmail(email)
                         .orElseThrow(() -> new RuntimeException("User not found"));
@@ -238,7 +238,7 @@ public class AuthServiceImpl implements AuthService {
                 String newRefreshToken = jwtUtil.generateRefreshToken(user);
 
                 // Return exact PDF JSON structure
-                return new RefreshTokenResponseDto(newAccessToken, newRefreshToken);
+                return new refreshTokenResponseDto(newAccessToken, newRefreshToken);
             } else {
                 throw new RuntimeException("Invalid refresh token");
             }
@@ -250,7 +250,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(LogoutRequestDto request) {
         try {
-            String username = jwtUtil.extractUsername(request.getRefreshToken());
+            String username = jwtUtil.extractUsername(request.getRefresh_token());
             if (username == null || username.trim().isEmpty()) {
                 throw new RuntimeException("Invalid token");
             }

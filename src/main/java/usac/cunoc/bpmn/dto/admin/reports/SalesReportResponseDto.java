@@ -24,10 +24,10 @@ public class SalesReportResponseDto {
     private SummaryDto summary;
 
     @Schema(description = "Sales breakdown by time period")
-    private List<PeriodSalesDto> salesByPeriod;
+    private List<PeriodSalesDto> sales_by_period;
 
     @Schema(description = "Sales breakdown by article type")
-    private List<TypeSalesDto> salesByType;
+    private List<TypeSalesDto> sales_by_type;
 
     @Data
     @NoArgsConstructor
@@ -35,13 +35,13 @@ public class SalesReportResponseDto {
     @Schema(description = "Period configuration")
     public static class PeriodDto {
         @Schema(description = "Period start date", example = "2024-01-01")
-        private LocalDate startDate;
+        private LocalDate start_date;
 
         @Schema(description = "Period end date", example = "2024-01-31")
-        private LocalDate endDate;
+        private LocalDate end_date;
 
         @Schema(description = "Group by criteria", example = "daily")
-        private String groupBy;
+        private String group_by;
     }
 
     @Data
@@ -50,16 +50,16 @@ public class SalesReportResponseDto {
     @Schema(description = "Sales summary")
     public static class SummaryDto {
         @Schema(description = "Total sales amount", example = "15000.50")
-        private BigDecimal totalSales;
+        private BigDecimal total_sales;
 
         @Schema(description = "Total number of orders", example = "125")
-        private Integer totalOrders;
+        private Integer total_orders;
 
         @Schema(description = "Average order value", example = "120.00")
-        private BigDecimal averageOrderValue;
+        private BigDecimal average_order_value;
 
         @Schema(description = "Total items sold", example = "250")
-        private Integer totalItems;
+        private Integer total_items;
     }
 
     @Data
@@ -71,13 +71,13 @@ public class SalesReportResponseDto {
         private String period;
 
         @Schema(description = "Total sales for period", example = "1250.75")
-        private BigDecimal totalSales;
+        private BigDecimal total_sales;
 
         @Schema(description = "Total orders for period", example = "10")
-        private Integer totalOrders;
+        private Integer total_orders;
 
         @Schema(description = "Total items for period", example = "20")
-        private Integer totalItems;
+        private Integer total_items;
     }
 
     @Data
@@ -89,10 +89,10 @@ public class SalesReportResponseDto {
         private String type;
 
         @Schema(description = "Total sales for type", example = "8500.25")
-        private BigDecimal totalSales;
+        private BigDecimal total_sales;
 
         @Schema(description = "Total orders for type", example = "75")
-        private Integer totalOrders;
+        private Integer total_orders;
 
         @Schema(description = "Percentage of total sales", example = "56.67")
         private BigDecimal percentage;

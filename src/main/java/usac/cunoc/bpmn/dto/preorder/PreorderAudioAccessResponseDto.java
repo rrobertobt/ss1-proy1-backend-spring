@@ -34,34 +34,34 @@ public class PreorderAudioAccessResponseDto {
         private ArticleDto article;
 
         @Schema(description = "Track title", example = "Preview Track 1")
-        private String trackTitle;
+        private String track_title;
 
         @Schema(description = "Duration in seconds", example = "180")
         private Integer duration;
 
         @Schema(description = "File size in bytes", example = "5242880")
-        private Integer fileSize;
+        private Integer file_size;
 
         @Schema(description = "Is downloadable", example = "true")
-        private Boolean isDownloadable;
+        private Boolean is_downloadable;
 
         @Schema(description = "Access granted date")
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        private LocalDateTime accessGrantedAt;
+        private LocalDateTime access_granted_at;
 
         @Schema(description = "Last played date")
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        private LocalDateTime lastPlayedAt;
+        private LocalDateTime last_played_at;
 
         @Schema(description = "Play count", example = "5")
-        private Integer playCount;
+        private Integer play_count;
 
         @Schema(description = "Is downloaded", example = "false")
         private Boolean downloaded;
 
         @Schema(description = "Downloaded date")
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        private LocalDateTime downloadedAt;
+        private LocalDateTime downloaded_at;
     }
 
     @Data
@@ -80,6 +80,6 @@ public class PreorderAudioAccessResponseDto {
         private String artist;
 
         @Schema(description = "Image URL", example = "https://example.com/image.jpg")
-        private String imageUrl;
+        private String image_url;
     }
 }

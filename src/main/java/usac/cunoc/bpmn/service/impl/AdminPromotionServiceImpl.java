@@ -41,13 +41,13 @@ public class AdminPromotionServiceImpl implements AdminPromotionService {
                 .orElseThrow(() -> new RuntimeException("Usuario administrador no encontrado"));
 
         // Validate promotion type exists
-        CdPromotionType promotionType = cdPromotionTypeRepository.findById(request.getPromotionTypeId())
+        CdPromotionType promotionType = cdPromotionTypeRepository.findById(request.getPromotion_type_id())
                 .orElseThrow(() -> new RuntimeException("Tipo de promoción no encontrado"));
 
         // Validate genre for genre-based promotions
         MusicGenre genre = null;
-        if (request.getGenreId() != null) {
-            genre = musicGenreRepository.findById(request.getGenreId())
+        if (request.getGenre_id() != null) {
+            genre = musicGenreRepository.findById(request.getGenre_id())
                     .orElseThrow(() -> new RuntimeException("Género musical no encontrado"));
         }
 
@@ -55,17 +55,17 @@ public class AdminPromotionServiceImpl implements AdminPromotionService {
         validatePromotionTypeRequirements(promotionType, request, genre);
 
         // Validate all articles exist and are CDs
-        validateArticlesForPromotion(request.getArticleIds(), genre);
+        validateArticlesForPromotion(request.getArticle_ids(), genre);
 
         // Create promotion
         CdPromotion promotion = new CdPromotion();
         promotion.setName(request.getName());
         promotion.setCdPromotionType(promotionType);
         promotion.setMusicGenre(genre);
-        promotion.setDiscountPercentage(request.getDiscountPercentage());
-        promotion.setMaxItems(request.getMaxItems());
-        promotion.setStartDate(request.getStartDate());
-        promotion.setEndDate(request.getEndDate());
+        promotion.setDiscountPercentage(request.getDiscount_percentage());
+        promotion.setMaxItems(request.getMax_items());
+        promotion.setStartDate(request.getStart_date());
+        promotion.setEndDate(request.getEnd_date());
         promotion.setIsActive(true);
         promotion.setUsageCount(0);
 
@@ -73,10 +73,10 @@ public class AdminPromotionServiceImpl implements AdminPromotionService {
         log.info("Created CD promotion with ID: {}", savedPromotion.getId());
 
         // Create promotion-article associations
-        createPromotionArticleAssociations(savedPromotion, request.getArticleIds());
+        createPromotionArticleAssociations(savedPromotion, request.getArticle_ids());
 
         // Build response
-        CreatePromotionResponseDto.PromotionTypeDto promotionTypeDto = new CreatePromotionResponseDto.PromotionTypeDto(
+        CreatePromotionResponseDto.promotion_typeDto promotionTypeDto = new CreatePromotionResponseDto.promotion_typeDto(
                 promotionType.getId(),
                 promotionType.getName());
 
@@ -107,21 +107,21 @@ public class AdminPromotionServiceImpl implements AdminPromotionService {
                 .orElseThrow(() -> new RuntimeException("Promoción no encontrada"));
 
         // Validate articles for promotion update
-        validateArticlesForPromotion(request.getArticleIds(), promotion.getMusicGenre());
+        validateArticlesForPromotion(request.getArticle_ids(), promotion.getMusicGenre());
 
         // Update promotion fields
         promotion.setName(request.getName());
-        promotion.setDiscountPercentage(request.getDiscountPercentage());
-        promotion.setMaxItems(request.getMaxItems());
-        promotion.setStartDate(request.getStartDate());
-        promotion.setEndDate(request.getEndDate());
-        promotion.setIsActive(request.getIsActive());
+        promotion.setDiscountPercentage(request.getDiscount_percentage());
+        promotion.setMaxItems(request.getMax_items());
+        promotion.setStartDate(request.getStart_date());
+        promotion.setEndDate(request.getEnd_date());
+        promotion.setIsActive(request.getIs_active());
         promotion.setUpdatedAt(LocalDateTime.now());
 
         CdPromotion updatedPromotion = cdPromotionRepository.save(promotion);
 
         // Update promotion-article associations
-        updatePromotionArticleAssociations(promotion, request.getArticleIds());
+        updatePromotionArticleAssociations(promotion, request.getArticle_ids());
 
         log.info("Updated CD promotion ID: {}", promotionId);
 
@@ -156,15 +156,15 @@ public class AdminPromotionServiceImpl implements AdminPromotionService {
     private void validatePromotionTypeRequirements(CdPromotionType promotionType, CreatePromotionRequestDto request,
             MusicGenre genre) {
         // Validate max items according to promotion type
-        if (request.getMaxItems() > promotionType.getMaxItems()) {
+        if (request.getMax_items() > promotionType.getMaxItems()) {
             throw new RuntimeException("La promoción de tipo '" + promotionType.getName() +
                     "' permite máximo " + promotionType.getMaxItems() + " artículos");
         }
 
         // Validate articles count
-        if (request.getArticleIds().size() > request.getMaxItems()) {
-            throw new RuntimeException("El número de artículos (" + request.getArticleIds().size() +
-                    ") excede el máximo permitido (" + request.getMaxItems() + ")");
+        if (request.getArticle_ids().size() > request.getMax_items()) {
+            throw new RuntimeException("El número de artículos (" + request.getArticle_ids().size() +
+                    ") excede el máximo permitido (" + request.getMax_items() + ")");
         }
 
         // Validate genre requirement for genre-based promotions
@@ -178,7 +178,7 @@ public class AdminPromotionServiceImpl implements AdminPromotionService {
         }
 
         // Validate time limitations
-        if (promotionType.getIsTimeLimited() && request.getEndDate() == null) {
+        if (promotionType.getIsTimeLimited() && request.getEnd_date() == null) {
             throw new RuntimeException("Las promociones de tipo '" + promotionType.getName() +
                     "' requieren fecha de finalización");
         }

@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(description = "Refresh token response data")
-public class RefreshTokenResponseDto {
+public class refreshTokenResponseDto {
 
     @Schema(description = "New JWT access token")
-    private String accessToken;
+    private String access_token;
 
     @Schema(description = "New JWT refresh token")
-    private String refreshToken;
+    private String refresh_token;
 }

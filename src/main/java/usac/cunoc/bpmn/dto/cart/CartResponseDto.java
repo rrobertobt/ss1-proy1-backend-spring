@@ -20,7 +20,7 @@ public class CartResponseDto {
     private Integer id;
 
     @Schema(description = "Total items count", example = "3")
-    private Integer totalItems;
+    private Integer total_items;
 
     @Schema(description = "Cart subtotal", example = "89.97")
     private BigDecimal subtotal;
@@ -44,13 +44,13 @@ public class CartResponseDto {
         private Integer quantity;
 
         @Schema(description = "Unit price", example = "29.99")
-        private BigDecimal unitPrice;
+        private BigDecimal unit_price;
 
         @Schema(description = "Discount applied", example = "0.00")
-        private BigDecimal discountApplied;
+        private BigDecimal discount_applied;
 
         @Schema(description = "Total price for this item", example = "59.98")
-        private BigDecimal totalPrice;
+        private BigDecimal total_price;
 
         @Schema(description = "Applied promotion", nullable = true)
         private PromotionDto promotion;
@@ -81,16 +81,16 @@ public class CartResponseDto {
         private CurrencyDto currency;
 
         @Schema(description = "Article image URL", example = "https://example.com/image.jpg")
-        private String imageUrl;
+        private String image_url;
 
         @Schema(description = "Article availability", example = "true")
-        private Boolean isAvailable;
+        private Boolean is_available;
 
         @Schema(description = "Is preorder item", example = "false")
-        private Boolean isPreorder;
+        private Boolean is_preorder;
 
         @Schema(description = "Stock quantity", example = "15")
-        private Integer stockQuantity;
+        private Integer stock_quantity;
     }
 
     @Data
@@ -132,38 +132,38 @@ public class CartResponseDto {
         private String name;
 
         @Schema(description = "Promotion type information")
-        private PromotionTypeDto promotionType;
+        private promotion_typeDto promotion_type;
 
         @Schema(description = "Genre information", nullable = true)
         private GenreDto genre;
 
         @Schema(description = "Discount percentage", example = "10.00")
-        private BigDecimal discountPercentage;
+        private BigDecimal discount_percentage;
 
         @Schema(description = "Maximum items", example = "4")
-        private Integer maxItems;
+        private Integer max_items;
 
         @Schema(description = "Start date", example = "2025-09-12T20:41:50.590Z")
-        private String startDate;
+        private String start_date;
 
         @Schema(description = "End date", example = "2025-09-12T20:41:50.590Z")
-        private String endDate;
+        private String end_date;
 
         @Schema(description = "Is promotion active", example = "true")
-        private Boolean isActive;
+        private Boolean is_active;
 
         @Schema(description = "Usage count", example = "15")
-        private Integer usageCount;
+        private Integer usage_count;
 
         @Schema(description = "Eligible articles for promotion")
-        private List<EligibleArticleDto> eligibleArticles;
+        private List<EligibleArticleDto> eligible_articles;
     }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @Schema(description = "Promotion type information")
-    public static class PromotionTypeDto {
+    public static class promotion_typeDto {
 
         @Schema(description = "Promotion type ID", example = "1")
         private Integer id;
@@ -207,6 +207,6 @@ public class CartResponseDto {
         private BigDecimal price;
 
         @Schema(description = "Article image URL", example = "string")
-        private String imageUrl;
+        private String image_url;
     }
 }

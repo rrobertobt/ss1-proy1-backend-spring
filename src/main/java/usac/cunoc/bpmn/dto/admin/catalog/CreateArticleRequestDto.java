@@ -22,7 +22,7 @@ public class CreateArticleRequestDto {
     @NotNull(message = "Artist ID is required")
     @Min(value = 1, message = "Invalid artist ID")
     @Schema(description = "Artist ID", example = "1")
-    private Integer artistId;
+    private Integer artist_id;
 
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0")
@@ -33,16 +33,16 @@ public class CreateArticleRequestDto {
     @NotNull(message = "Currency ID is required")
     @Min(value = 1, message = "Invalid currency ID")
     @Schema(description = "Currency ID", example = "1")
-    private Integer currencyId;
+    private Integer currency_id;
 
     @NotNull(message = "Music genre ID is required")
     @Min(value = 1, message = "Invalid music genre ID")
     @Schema(description = "Music genre ID", example = "1")
-    private Integer musicGenreId;
+    private Integer music_genre_id;
 
     @Schema(description = "Release date", example = "1969-09-26", type = "string", format = "date")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate releaseDate;
+    private LocalDate release_date;
 
     @Schema(description = "Article description")
     private String description;
@@ -53,7 +53,7 @@ public class CreateArticleRequestDto {
 
     @Min(value = 1, message = "Weight must be positive")
     @Schema(description = "Weight in grams", example = "180")
-    private Integer weightGrams;
+    private Integer weight_grams;
 
     @Size(max = 50, message = "Barcode must not exceed 50 characters")
     @Schema(description = "Barcode", example = "194397215915")
@@ -62,33 +62,33 @@ public class CreateArticleRequestDto {
     @NotNull(message = "Stock quantity is required")
     @Min(value = 0, message = "Stock quantity cannot be negative")
     @Schema(description = "Initial stock quantity", example = "50")
-    private Integer stockQuantity;
+    private Integer stock_quantity;
 
     @Min(value = 0, message = "Minimum stock level cannot be negative")
     @Schema(description = "Minimum stock level", example = "5")
-    private Integer minStockLevel = 5;
+    private Integer min_stock_level = 5;
 
     @Min(value = 1, message = "Maximum stock level must be positive")
     @Schema(description = "Maximum stock level", example = "100")
-    private Integer maxStockLevel = 100;
+    private Integer max_stock_level = 100;
 
     @Schema(description = "Is article available for purchase", example = "true")
-    private Boolean isAvailable = true;
+    private Boolean is_available = true;
 
     @Schema(description = "Is article in preorder", example = "false")
-    private Boolean isPreorder = false;
+    private Boolean is_preorder = false;
 
     @Schema(description = "Preorder release date", example = "2024-12-25", type = "string", format = "date")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate preorderReleaseDate;
+    private LocalDate pre_order_release_date;
 
     @Schema(description = "Preorder end date", example = "2024-12-20", type = "string", format = "date")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate preorderEndDate;
+    private LocalDate pre_order_end_date;
 
     @Size(max = 500, message = "Image URL must not exceed 500 characters")
     @Schema(description = "Article image URL", example = "https://example.com/images/abbey-road.jpg")
-    private String imageUrl;
+    private String image_url;
 
     @NotBlank(message = "Article type is required")
     @Pattern(regexp = "^(vinyl|cassette|cd)$", message = "Type must be vinyl, cassette, or cd")
@@ -96,5 +96,5 @@ public class CreateArticleRequestDto {
     private String type;
 
     @Schema(description = "Type-specific details")
-    private Object typeDetails;
+    private Object type_details;
 }

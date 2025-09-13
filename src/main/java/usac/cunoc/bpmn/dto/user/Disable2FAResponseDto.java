@@ -15,5 +15,5 @@ import lombok.NoArgsConstructor;
 public class Disable2FAResponseDto {
 
     @Schema(description = "Whether 2FA is enabled", example = "false")
-    private Boolean is2faEnabled;
+    private Boolean is_2fa_enabled;
 }

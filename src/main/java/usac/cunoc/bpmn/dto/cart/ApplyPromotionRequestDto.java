@@ -19,9 +19,9 @@ public class ApplyPromotionRequestDto {
 
     @NotNull(message = "Promotion ID is required")
     @Schema(description = "Promotion ID", example = "1", required = true)
-    private Integer promotionId;
+    private Integer promotion_id;
 
     @NotEmpty(message = "Article IDs list cannot be empty")
     @Schema(description = "List of article IDs to apply promotion to", example = "[1, 2, 3]", required = true)
-    private List<Integer> articleIds;
+    private List<Integer> article_ids;
 }

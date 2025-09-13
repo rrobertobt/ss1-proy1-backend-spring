@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Request to add article to wishlist")
 public class AddWishlistItemRequestDto {
 
-    @NotNull(message = "articleId es requerido")
-    @Positive(message = "articleId debe ser positivo")
+    @NotNull(message = "article_id es requerido")
+    @Positive(message = "article_id debe ser positivo")
     @Schema(description = "ID of the article to add to wishlist", example = "1", required = true)
-    private Integer articleId;
+    private Integer article_id;
 }

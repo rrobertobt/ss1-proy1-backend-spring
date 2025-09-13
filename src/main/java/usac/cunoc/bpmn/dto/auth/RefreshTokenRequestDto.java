@@ -9,9 +9,9 @@ import lombok.Data;
  */
 @Data
 @Schema(description = "Refresh token request data")
-public class RefreshTokenRequestDto {
+public class refreshTokenRequestDto {
 
     @NotBlank(message = "Refresh token is required")
     @Schema(description = "JWT refresh token")
-    private String refreshToken;
+    private String refresh_token;
 }

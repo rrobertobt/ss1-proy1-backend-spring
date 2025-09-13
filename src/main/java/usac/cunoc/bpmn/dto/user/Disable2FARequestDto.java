@@ -19,5 +19,5 @@ public class Disable2FARequestDto {
     @NotBlank(message = "2FA code is required")
     @Size(min = 6, max = 6, message = "2FA code must be 6 characters")
     @Schema(description = "Current 2FA code", example = "123456")
-    private String twoFactorCode;
+    private String two_factor_code;
 }

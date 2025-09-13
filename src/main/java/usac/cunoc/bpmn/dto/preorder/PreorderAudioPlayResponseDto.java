@@ -21,9 +21,9 @@ public class PreorderAudioPlayResponseDto {
     private Integer audioId;
 
     @Schema(description = "Current play count", example = "6")
-    private Integer playCount;
+    private Integer play_count;
 
     @Schema(description = "Last played timestamp")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime lastPlayedAt;
+    private LocalDateTime last_played_at;
 }

@@ -31,7 +31,7 @@ public class CassetteCategoryListResponseDto {
         private String name;
 
         @Schema(description = "Discount percentage", example = "0.00")
-        private BigDecimal discountPercentage;
+        private BigDecimal discount_percentage;
 
         @Schema(description = "Category description")
         private String description;

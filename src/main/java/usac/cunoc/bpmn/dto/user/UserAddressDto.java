@@ -18,10 +18,10 @@ public class UserAddressDto {
     private Integer id;
 
     @Schema(description = "Address line 1", example = "123 Main Street")
-    private String addressLine1;
+    private String address_line1;
 
     @Schema(description = "Address line 2", example = "Apt 4B")
-    private String addressLine2;
+    private String address_line2;
 
     @Schema(description = "City", example = "Guatemala City")
     private String city;
@@ -30,17 +30,17 @@ public class UserAddressDto {
     private String state;
 
     @Schema(description = "Postal code", example = "01001")
-    private String postalCode;
+    private String postal_code;
 
     @Schema(description = "Country name", example = "Guatemala")
     private String country;
 
     @Schema(description = "Is default address", example = "true")
-    private Boolean isDefault;
+    private Boolean is_default;
 
     @Schema(description = "Is default billing address", example = "true")
-    private Boolean isBillingDefault;
+    private Boolean is_billing_default;
 
     @Schema(description = "Is default shipping address", example = "true")
-    private Boolean isShippingDefault;
+    private Boolean is_shipping_default;
 }

@@ -47,14 +47,14 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public ProcessPaymentResponseDto processPayment(ProcessPaymentRequestDto request, Integer userId) {
-        log.info("Processing payment for order {} by user {}", request.getOrderId(), userId);
+        log.info("Processing payment for order {} by user {}", request.getOrder_id(), userId);
 
         // Get and validate user
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         // Get and validate order belongs to user
-        Order order = orderRepository.findById(request.getOrderId())
+        Order order = orderRepository.findById(request.getOrder_id())
                 .orElseThrow(() -> new RuntimeException("Orden no encontrada"));
 
         if (!order.getUser().getId().equals(userId)) {
@@ -67,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         // Validate payment method exists and is active
-        PaymentMethod paymentMethod = paymentMethodRepository.findById(request.getPaymentMethodId())
+        PaymentMethod paymentMethod = paymentMethodRepository.findById(request.getPayment_method_id())
                 .orElseThrow(() -> new RuntimeException("Método de pago no encontrado"));
 
         if (!paymentMethod.getIsActive()) {
@@ -76,7 +76,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         // Validate credit card belongs to user and is active
         @SuppressWarnings("unused")
-        CreditCard creditCard = creditCardRepository.findByIdAndUserAndIsActiveTrue(request.getCardId(), user)
+        CreditCard creditCard = creditCardRepository.findByIdAndUserAndIsActiveTrue(request.getCard_id(), user)
                 .orElseThrow(() -> new RuntimeException("Tarjeta de crédito no encontrada o no válida"));
 
         // Validate payment amount matches order total

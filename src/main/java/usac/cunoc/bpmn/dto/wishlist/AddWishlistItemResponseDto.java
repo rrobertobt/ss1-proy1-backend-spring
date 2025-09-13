@@ -17,14 +17,14 @@ import java.time.LocalDateTime;
 public class AddWishlistItemResponseDto {
 
     @Schema(description = "Wishlist ID", example = "1")
-    private Integer wishlistId;
+    private Integer wishlist_id;
 
     @Schema(description = "Wishlist item ID", example = "10")
-    private Integer itemId;
+    private Integer item_id;
 
     @Schema(description = "Article ID that was added", example = "5")
-    private Integer articleId;
+    private Integer article_id;
 
     @Schema(description = "Item creation timestamp", example = "2024-03-15T10:30:00")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 }

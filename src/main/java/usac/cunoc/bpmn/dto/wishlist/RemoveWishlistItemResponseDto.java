@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 
 /**
  * Response DTO for removing item from wishlist
- * Matches PDF specification exactly for DELETE /api/v1/wishlist/items/{id} response
+ * Matches PDF specification exactly for DELETE /api/v1/wishlist/items/{id}
+ * response
  */
 @Data
 @NoArgsConstructor
@@ -16,11 +17,11 @@ import lombok.NoArgsConstructor;
 public class RemoveWishlistItemResponseDto {
 
     @Schema(description = "ID of the removed wishlist item", example = "10")
-    private Integer removedItemId;
+    private Integer removed_item_id;
 
     @Schema(description = "Wishlist ID", example = "1")
-    private Integer wishlistId;
+    private Integer wishlist_id;
 
     @Schema(description = "New total items count in wishlist", example = "2")
-    private Integer newTotalItems;
+    private Integer newtotal_items;
 }

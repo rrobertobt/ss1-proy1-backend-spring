@@ -21,5 +21,5 @@ public class VerifyEmailRequestDto {
     @NotBlank(message = "Verification code is required")
     @Size(min = 6, max = 6, message = "Verification code must be 6 characters")
     @Schema(description = "6-digit verification code", example = "123456")
-    private String verificationCode;
+    private String verification_code;
 }

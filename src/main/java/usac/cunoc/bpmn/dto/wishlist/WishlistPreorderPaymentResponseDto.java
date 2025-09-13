@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
 
 /**
  * Response DTO for preorder payment from wishlist
- * Matches PDF specification exactly for POST /api/v1/wishlist/items/{id}/preorder-payment response
+ * Matches PDF specification exactly for POST
+ * /api/v1/wishlist/items/{id}/preorder-payment response
  */
 @Data
 @NoArgsConstructor
@@ -18,20 +19,20 @@ import java.time.LocalDateTime;
 public class WishlistPreorderPaymentResponseDto {
 
     @Schema(description = "Payment ID", example = "25")
-    private Integer paymentId;
+    private Integer payment_id;
 
     @Schema(description = "Wishlist item ID that was paid", example = "10")
-    private Integer wishlistItemId;
+    private Integer wishlist_item_id;
 
     @Schema(description = "Article ID", example = "5")
-    private Integer articleId;
+    private Integer article_id;
 
     @Schema(description = "Payment amount", example = "29.99")
     private BigDecimal amount;
 
     @Schema(description = "Preorder payment status", example = "true")
-    private Boolean isPreorderPaid;
+    private Boolean is_preorder_paid;
 
     @Schema(description = "Payment processing timestamp", example = "2024-03-15T10:35:00")
-    private LocalDateTime processedAt;
+    private LocalDateTime processed_at;
 }

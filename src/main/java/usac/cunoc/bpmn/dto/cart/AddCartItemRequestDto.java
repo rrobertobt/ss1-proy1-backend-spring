@@ -18,7 +18,7 @@ public class AddCartItemRequestDto {
 
     @NotNull(message = "Article ID is required")
     @Schema(description = "Article ID", example = "1", required = true)
-    private Integer articleId;
+    private Integer article_id;
 
     @NotNull(message = "Quantity is required")
     @Min(value = 1, message = "Quantity must be at least 1")

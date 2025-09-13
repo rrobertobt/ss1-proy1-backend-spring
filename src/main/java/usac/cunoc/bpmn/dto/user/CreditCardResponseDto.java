@@ -19,28 +19,28 @@ public class CreditCardResponseDto {
     private Integer id;
 
     @Schema(description = "Last four digits", example = "1111")
-    private String lastFourDigits;
+    private String last_four_digits;
 
     @Schema(description = "Card brand information")
-    private CardBrandDto cardBrand;
+    private CardBrandDto card_brand;
 
     @Schema(description = "Cardholder name (decrypted)", example = "John Doe")
-    private String cardholderName;
+    private String card_holder_name;
 
     @Schema(description = "Expiry month (decrypted)", example = "12")
-    private String expiryMonth;
+    private String expiry_month;
 
     @Schema(description = "Expiry year (decrypted)", example = "2028")
-    private String expiryYear;
+    private String expiry_year;
 
     @Schema(description = "Is default card", example = "false")
-    private Boolean isDefault;
+    private Boolean is_default;
 
     @Schema(description = "Is card active", example = "true")
-    private Boolean isActive;
+    private Boolean is_active;
 
     @Schema(description = "Creation date")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 
     @Data
     @NoArgsConstructor
@@ -54,6 +54,6 @@ public class CreditCardResponseDto {
         private String name;
 
         @Schema(description = "Brand logo URL")
-        private String logoUrl;
+        private String logo_url;
     }
 }

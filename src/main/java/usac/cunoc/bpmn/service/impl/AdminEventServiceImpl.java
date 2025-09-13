@@ -40,9 +40,9 @@ public class AdminEventServiceImpl implements AdminEventService {
 
         // Validate article exists if provided
         AnalogArticle article = null;
-        if (request.getArticleId() != null) {
-            article = analogArticleRepository.findById(request.getArticleId())
-                    .orElseThrow(() -> new RuntimeException("Article not found with ID: " + request.getArticleId()));
+        if (request.getArticle_id() != null) {
+            article = analogArticleRepository.findById(request.getArticle_id())
+                    .orElseThrow(() -> new RuntimeException("Article not found with ID: " + request.getArticle_id()));
         }
 
         // Create new event entity
@@ -51,13 +51,13 @@ public class AdminEventServiceImpl implements AdminEventService {
         event.setDescription(request.getDescription());
         event.setEventStatus(defaultStatus);
         event.setAnalogArticle(article);
-        event.setAudioFileUrl(request.getAudioFileUrl());
-        event.setAudioDurationSeconds(request.getAudioDuration());
-        event.setStartDatetime(request.getStartDatetime());
-        event.setEndDatetime(request.getEndDatetime());
-        event.setMaxParticipants(request.getMaxParticipants());
+        event.setAudioFileUrl(request.getAudio_file_url());
+        event.setAudioDurationSeconds(request.getAudio_duration());
+        event.setStartDatetime(request.getStart_datetime());
+        event.setEndDatetime(request.getEnd_datetime());
+        event.setMaxParticipants(request.getMax_participants());
         event.setCurrentParticipants(0);
-        event.setAllowChat(request.getAllowChat() != null ? request.getAllowChat() : true);
+        event.setAllowChat(request.getAllow_chat() != null ? request.getAllow_chat() : true);
         event.setCreatedByUser(adminUser);
         event.setCreatedAt(LocalDateTime.now());
         event.setUpdatedAt(LocalDateTime.now());
@@ -100,39 +100,39 @@ public class AdminEventServiceImpl implements AdminEventService {
             event.setDescription(request.getDescription());
         }
 
-        if (request.getArticleId() != null) {
-            AnalogArticle article = analogArticleRepository.findById(request.getArticleId())
-                    .orElseThrow(() -> new RuntimeException("Article not found with ID: " + request.getArticleId()));
+        if (request.getArticle_id() != null) {
+            AnalogArticle article = analogArticleRepository.findById(request.getArticle_id())
+                    .orElseThrow(() -> new RuntimeException("Article not found with ID: " + request.getArticle_id()));
             event.setAnalogArticle(article);
         }
 
-        if (request.getAudioFileUrl() != null) {
-            event.setAudioFileUrl(request.getAudioFileUrl());
+        if (request.getAudio_file_url() != null) {
+            event.setAudioFileUrl(request.getAudio_file_url());
         }
 
-        if (request.getAudioDuration() != null) {
-            event.setAudioDurationSeconds(request.getAudioDuration());
+        if (request.getAudio_duration() != null) {
+            event.setAudioDurationSeconds(request.getAudio_duration());
         }
 
-        if (request.getStartDatetime() != null) {
-            event.setStartDatetime(request.getStartDatetime());
+        if (request.getStart_datetime() != null) {
+            event.setStartDatetime(request.getStart_datetime());
         }
 
-        if (request.getEndDatetime() != null) {
-            event.setEndDatetime(request.getEndDatetime());
+        if (request.getEnd_datetime() != null) {
+            event.setEndDatetime(request.getEnd_datetime());
         }
 
-        if (request.getMaxParticipants() != null) {
+        if (request.getMax_participants() != null) {
             // Validate that new max is not less than current participants
-            if (request.getMaxParticipants() < event.getCurrentParticipants()) {
+            if (request.getMax_participants() < event.getCurrentParticipants()) {
                 throw BusinessValidationException.maxParticipantsBelowCurrent(
-                        request.getMaxParticipants(), event.getCurrentParticipants());
+                        request.getMax_participants(), event.getCurrentParticipants());
             }
-            event.setMaxParticipants(request.getMaxParticipants());
+            event.setMaxParticipants(request.getMax_participants());
         }
 
-        if (request.getAllowChat() != null) {
-            event.setAllowChat(request.getAllowChat());
+        if (request.getAllow_chat() != null) {
+            event.setAllowChat(request.getAllow_chat());
         }
 
         // Update timestamp

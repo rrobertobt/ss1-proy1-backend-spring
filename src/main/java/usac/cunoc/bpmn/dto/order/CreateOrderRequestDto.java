@@ -17,18 +17,18 @@ public class CreateOrderRequestDto {
 
     @NotNull(message = "Shipping address ID is required")
     @Schema(description = "Shipping address ID", example = "1", required = true)
-    private Integer shippingAddressId;
+    private Integer shipping_address_id;
 
     @NotNull(message = "Billing address ID is required")
     @Schema(description = "Billing address ID", example = "1", required = true)
-    private Integer billingAddressId;
+    private Integer billing_address_id;
 
     @NotNull(message = "Payment method ID is required")
     @Schema(description = "Payment method ID", example = "1", required = true)
-    private Integer paymentMethodId;
+    private Integer payment_method_id;
 
     @Schema(description = "Credit card ID (if payment method requires card)", example = "1")
-    private Integer cardId;
+    private Integer card_id;
 
     @Schema(description = "Order notes", example = "Please deliver during business hours")
     private String notes;

@@ -28,24 +28,24 @@ public class CreateArtistResponseDto {
 
     @Schema(description = "Formation date", example = "1960-08-01", type = "string", format = "date")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate formationDate;
+    private LocalDate formation_date;
 
     @Schema(description = "Career start date", example = "1960-08-01", type = "string", format = "date")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate careerStartDate;
+    private LocalDate career_start_date;
 
     @Schema(description = "Country information")
     private CountryDto country;
 
     @Schema(description = "Is this a band", example = "true")
-    private Boolean isBand;
+    private Boolean is_band;
 
     @Schema(description = "Artist website", example = "https://www.thebeatles.com")
     private String website;
 
     @Schema(description = "Creation timestamp", example = "2025-01-15T10:30:00")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 
     @Data
     @NoArgsConstructor

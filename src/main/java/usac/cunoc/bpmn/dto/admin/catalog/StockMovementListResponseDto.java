@@ -36,32 +36,32 @@ public class StockMovementListResponseDto {
         private ArticleInfoDto article;
 
         @Schema(description = "Movement type", example = "Entrada")
-        private String movementType;
+        private String movement_type;
 
         @Schema(description = "Quantity moved", example = "10")
         private Integer quantity;
 
         @Schema(description = "Previous stock", example = "15")
-        private Integer previousStock;
+        private Integer previous_stock;
 
         @Schema(description = "New stock", example = "25")
-        private Integer newStock;
+        private Integer new_stock;
 
         @Schema(description = "Reference type", example = "Ajuste Manual")
-        private String referenceType;
+        private String reference_type;
 
         @Schema(description = "Reference ID", example = "null")
-        private Integer referenceId;
+        private Integer reference_id;
 
         @Schema(description = "Movement notes")
         private String notes;
 
         @Schema(description = "Created by user")
-        private UserInfoDto createdBy;
+        private UserInfoDto created_by;
 
         @Schema(description = "Movement creation timestamp")
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        private LocalDateTime createdAt;
+        private LocalDateTime created_at;
     }
 
     @Data

@@ -46,17 +46,17 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         // Update only provided fields
-        if (request.getFirstName() != null) {
-            user.setFirstName(request.getFirstName());
+        if (request.getFirst_name() != null) {
+            user.setFirstName(request.getFirst_name());
         }
-        if (request.getLastName() != null) {
-            user.setLastName(request.getLastName());
+        if (request.getLast_name() != null) {
+            user.setLastName(request.getLast_name());
         }
         if (request.getPhone() != null) {
             user.setPhone(request.getPhone());
         }
-        if (request.getGenderId() != null) {
-            Gender gender = genderRepository.findById(request.getGenderId())
+        if (request.getGender_id() != null) {
+            Gender gender = genderRepository.findById(request.getGender_id())
                     .orElseThrow(() -> new RuntimeException("Género no encontrado"));
             user.setGender(gender);
         }
@@ -77,32 +77,32 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("No se pueden agregar más de 5 direcciones por usuario");
         }
 
-        Country country = countryRepository.findById(request.getCountryId())
+        Country country = countryRepository.findById(request.getCountry_id())
                 .orElseThrow(() -> new RuntimeException("País no encontrado"));
 
         // Handle default flags - if this is the first address, make it default
         boolean isFirstAddress = addressCount == 0;
-        if (isFirstAddress || Boolean.TRUE.equals(request.getIsDefault())) {
+        if (isFirstAddress || Boolean.TRUE.equals(request.getIs_default())) {
             userAddressRepository.clearDefaultFlags(user);
         }
-        if (isFirstAddress || Boolean.TRUE.equals(request.getIsBillingDefault())) {
+        if (isFirstAddress || Boolean.TRUE.equals(request.getIs_billing_default())) {
             userAddressRepository.clearBillingDefaultFlags(user);
         }
-        if (isFirstAddress || Boolean.TRUE.equals(request.getIsShippingDefault())) {
+        if (isFirstAddress || Boolean.TRUE.equals(request.getIs_shipping_default())) {
             userAddressRepository.clearShippingDefaultFlags(user);
         }
 
         UserAddress address = new UserAddress();
         address.setUser(user);
-        address.setAddressLine1(request.getAddressLine1());
-        address.setAddressLine2(request.getAddressLine2());
+        address.setAddressLine1(request.getAddress_line1());
+        address.setAddressLine2(request.getAddress_line2());
         address.setCity(request.getCity());
         address.setState(request.getState());
-        address.setPostalCode(request.getPostalCode());
+        address.setPostalCode(request.getPostal_code());
         address.setCountry(country);
-        address.setIsDefault(isFirstAddress || Boolean.TRUE.equals(request.getIsDefault()));
-        address.setIsBillingDefault(isFirstAddress || Boolean.TRUE.equals(request.getIsBillingDefault()));
-        address.setIsShippingDefault(isFirstAddress || Boolean.TRUE.equals(request.getIsShippingDefault()));
+        address.setIsDefault(isFirstAddress || Boolean.TRUE.equals(request.getIs_default()));
+        address.setIsBillingDefault(isFirstAddress || Boolean.TRUE.equals(request.getIs_billing_default()));
+        address.setIsShippingDefault(isFirstAddress || Boolean.TRUE.equals(request.getIs_shipping_default()));
 
         UserAddress savedAddress = userAddressRepository.save(address);
         return mapToAddressResponse(savedAddress);
@@ -128,31 +128,32 @@ public class UserServiceImpl implements UserService {
         UserAddress address = userAddressRepository.findByIdAndUser(addressId, user)
                 .orElseThrow(() -> new RuntimeException("Dirección no encontrada"));
 
-        Country country = countryRepository.findById(request.getCountryId())
+        Country country = countryRepository.findById(request.getCountry_id())
                 .orElseThrow(() -> new RuntimeException("País no encontrado"));
 
         // Handle default flags
-        if (Boolean.TRUE.equals(request.getIsDefault()) && !Boolean.TRUE.equals(address.getIsDefault())) {
+        if (Boolean.TRUE.equals(request.getIs_default()) && !Boolean.TRUE.equals(address.getIsDefault())) {
             userAddressRepository.clearDefaultFlags(user);
         }
-        if (Boolean.TRUE.equals(request.getIsBillingDefault()) && !Boolean.TRUE.equals(address.getIsBillingDefault())) {
+        if (Boolean.TRUE.equals(request.getIs_billing_default())
+                && !Boolean.TRUE.equals(address.getIsBillingDefault())) {
             userAddressRepository.clearBillingDefaultFlags(user);
         }
-        if (Boolean.TRUE.equals(request.getIsShippingDefault())
+        if (Boolean.TRUE.equals(request.getIs_shipping_default())
                 && !Boolean.TRUE.equals(address.getIsShippingDefault())) {
             userAddressRepository.clearShippingDefaultFlags(user);
         }
 
         // Update address fields
-        address.setAddressLine1(request.getAddressLine1());
-        address.setAddressLine2(request.getAddressLine2());
+        address.setAddressLine1(request.getAddress_line1());
+        address.setAddressLine2(request.getAddress_line2());
         address.setCity(request.getCity());
         address.setState(request.getState());
-        address.setPostalCode(request.getPostalCode());
+        address.setPostalCode(request.getPostal_code());
         address.setCountry(country);
-        address.setIsDefault(Boolean.TRUE.equals(request.getIsDefault()));
-        address.setIsBillingDefault(Boolean.TRUE.equals(request.getIsBillingDefault()));
-        address.setIsShippingDefault(Boolean.TRUE.equals(request.getIsShippingDefault()));
+        address.setIsDefault(Boolean.TRUE.equals(request.getIs_default()));
+        address.setIsBillingDefault(Boolean.TRUE.equals(request.getIs_billing_default()));
+        address.setIsShippingDefault(Boolean.TRUE.equals(request.getIs_shipping_default()));
 
         UserAddress savedAddress = userAddressRepository.save(address);
         return mapToAddressResponse(savedAddress);
@@ -183,13 +184,13 @@ public class UserServiceImpl implements UserService {
         }
 
         // Validate expiry date
-        validateCardExpiryDate(request.getExpiryMonth(), request.getExpiryYear());
+        validateCardExpiryDate(request.getExpiry_month(), request.getExpiry_month());
 
-        CardBrand cardBrand = cardBrandRepository.findById(request.getCardBrandId())
+        CardBrand cardBrand = cardBrandRepository.findById(request.getCard_brand_id())
                 .orElseThrow(() -> new RuntimeException("Marca de tarjeta no encontrada"));
 
         // Extract last four digits
-        String lastFourDigits = request.getCardNumber().substring(request.getCardNumber().length() - 4);
+        String lastFourDigits = request.getCard_number().substring(request.getCard_number().length() - 4);
 
         // Check for duplicate last four digits
         if (creditCardRepository.existsByUserAndLastFourDigitsAndIsActiveTrue(user, lastFourDigits)) {
@@ -198,21 +199,21 @@ public class UserServiceImpl implements UserService {
 
         // Handle default flag - if this is the first card, make it default
         boolean isFirstCard = cardCount == 0;
-        if (isFirstCard || Boolean.TRUE.equals(request.getIsDefault())) {
+        if (isFirstCard || Boolean.TRUE.equals(request.getIs_default())) {
             creditCardRepository.clearDefaultFlags(user);
         }
 
         // Encrypt sensitive data
         CreditCard creditCard = new CreditCard();
         creditCard.setUser(user);
-        creditCard.setCardNumberEncrypted(encryptionService.encrypt(request.getCardNumber()));
-        creditCard.setCardholderNameEncrypted(encryptionService.encrypt(request.getCardholderName()));
-        creditCard.setExpiryMonthEncrypted(encryptionService.encrypt(request.getExpiryMonth()));
-        creditCard.setExpiryYearEncrypted(encryptionService.encrypt(request.getExpiryYear()));
+        creditCard.setCardNumberEncrypted(encryptionService.encrypt(request.getCard_number()));
+        creditCard.setCardholderNameEncrypted(encryptionService.encrypt(request.getCard_holder_name()));
+        creditCard.setExpiryMonthEncrypted(encryptionService.encrypt(request.getExpiry_month()));
+        creditCard.setExpiryYearEncrypted(encryptionService.encrypt(request.getExpiry_month()));
         creditCard.setCvvEncrypted(encryptionService.encrypt(request.getCvv()));
         creditCard.setCardBrand(cardBrand);
         creditCard.setLastFourDigits(lastFourDigits);
-        creditCard.setIsDefault(isFirstCard || Boolean.TRUE.equals(request.getIsDefault()));
+        creditCard.setIsDefault(isFirstCard || Boolean.TRUE.equals(request.getIs_default()));
 
         CreditCard savedCard = creditCardRepository.save(creditCard);
         return mapToCreditCardResponse(savedCard);
@@ -276,7 +277,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // Verify 2FA code (simplified - in production would verify against TOTP)
-        if (!request.getTwoFactorCode().matches("\\d{6}")) {
+        if (!request.getTwo_factor_code().matches("\\d{6}")) {
             throw new RuntimeException("Código 2FA inválido");
         }
 
@@ -298,7 +299,7 @@ public class UserServiceImpl implements UserService {
                     user.getGender().getId(), user.getGender().getName());
         }
 
-        UserProfileResponseDto.UserTypeDto userTypeDto = new UserProfileResponseDto.UserTypeDto(
+        UserProfileResponseDto.user_typeDto userTypeDto = new UserProfileResponseDto.user_typeDto(
                 user.getUserType().getId(), user.getUserType().getName());
 
         return new UserProfileResponseDto(

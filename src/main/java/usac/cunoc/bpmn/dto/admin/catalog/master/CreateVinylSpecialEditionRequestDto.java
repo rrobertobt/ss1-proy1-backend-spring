@@ -29,26 +29,26 @@ public class CreateVinylSpecialEditionRequestDto {
     private String color;
 
     @Schema(description = "Material description", example = "Vinilo con acabado holográfico especial")
-    private String materialDescription;
+    private String material_description;
 
     @Schema(description = "Extra content included", example = "Poster holográfico y stickers exclusivos")
-    private String extraContent;
+    private String extra_content;
 
     @NotNull(message = "Is limited field is required")
     @Schema(description = "Whether this is a limited edition", example = "true", required = true)
-    private Boolean isLimited;
+    private Boolean is_limited;
 
     @Min(value = 1, message = "Limited quantity must be at least 1")
-    @Schema(description = "Limited quantity (required if isLimited is true)", example = "150")
-    private Integer limitedQuantity;
+    @Schema(description = "Limited quantity (required if is_limited is true)", example = "150")
+    private Integer limited_quantity;
 
     /**
      * Custom validation method called by JSR-303
      */
     @AssertTrue(message = "Limited editions must have a valid limited quantity")
-    private boolean isValidLimitedQuantity() {
-        if (Boolean.TRUE.equals(isLimited)) {
-            return limitedQuantity != null && limitedQuantity > 0;
+    private boolean isValidlimited_quantity() {
+        if (Boolean.TRUE.equals(is_limited)) {
+            return limited_quantity != null && limited_quantity > 0;
         }
         return true; // Non-limited editions don't need quantity validation
     }

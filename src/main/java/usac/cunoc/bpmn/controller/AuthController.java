@@ -63,7 +63,7 @@ public class AuthController {
                 LoginResponseDto response = authService.login(request);
 
                 // Si requires2fa es true, no devolvemos mensaje "Login exitoso"
-                if (Boolean.TRUE.equals(response.getRequires2fa())) {
+                if (Boolean.TRUE.equals(response.getRequires_2fa())) {
                         return ResponseEntity.ok(ApiResponseDto.success(null, response));
                 } else {
                         return ResponseEntity.ok(ApiResponseDto.success(null, response));
@@ -115,10 +115,10 @@ public class AuthController {
                         @ApiResponse(responseCode = "200", description = "Token refreshed successfully"),
                         @ApiResponse(responseCode = "401", description = "Invalid refresh token")
         })
-        public ResponseEntity<ApiResponseDto<RefreshTokenResponseDto>> refreshToken(
-                        @Valid @RequestBody RefreshTokenRequestDto request) {
+        public ResponseEntity<ApiResponseDto<refreshTokenResponseDto>> refreshToken(
+                        @Valid @RequestBody refreshTokenRequestDto request) {
 
-                RefreshTokenResponseDto response = authService.refreshToken(request);
+                refreshTokenResponseDto response = authService.refreshToken(request);
                 return ResponseEntity.ok(ApiResponseDto.success(null, response));
         }
 

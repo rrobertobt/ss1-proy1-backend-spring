@@ -14,7 +14,7 @@ public class TopRatedRequestDto {
 
     @Min(value = 1, message = "Minimum ratings must be at least 1")
     @Schema(description = "Minimum number of ratings required", example = "5")
-    private Integer minRatings = 5;
+    private Integer min_ratings = 5;
 
     @Min(value = 1, message = "Limit must be at least 1")
     @Max(value = 50, message = "Limit cannot exceed 50")

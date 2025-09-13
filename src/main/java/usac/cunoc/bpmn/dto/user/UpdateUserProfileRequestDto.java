@@ -13,16 +13,16 @@ public class UpdateUserProfileRequestDto {
 
     @Size(max = 100, message = "First name must not exceed 100 characters")
     @Schema(description = "First name", example = "John")
-    private String firstName;
+    private String first_name;
 
     @Size(max = 100, message = "Last name must not exceed 100 characters")
     @Schema(description = "Last name", example = "Doe")
-    private String lastName;
+    private String last_name;
 
     @Size(max = 20, message = "Phone must not exceed 20 characters")
     @Schema(description = "Phone number", example = "+50212345678")
     private String phone;
 
     @Schema(description = "Gender ID", example = "1")
-    private Integer genderId;
+    private Integer gender_id;
 }

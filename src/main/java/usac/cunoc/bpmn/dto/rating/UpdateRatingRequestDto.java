@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 /**
  * Request DTO for updating article rating
  * Matches PDF specification exactly for PUT
- * /api/v1/articles/{articleId}/ratings/{id}
+ * /api/v1/articles/{article_id}/ratings/{id}
  */
 @Data
 @NoArgsConstructor
@@ -26,7 +26,7 @@ public class UpdateRatingRequestDto {
     @Schema(description = "Rating value from 1 to 5", example = "5", required = true)
     private Integer rating;
 
-    @Size(max = 1000, message = "reviewText no puede exceder 1000 caracteres")
+    @Size(max = 1000, message = "review_text no puede exceder 1000 caracteres")
     @Schema(description = "Review text (optional)", example = "Actualización del review: aún mejor que antes")
-    private String reviewText;
+    private String review_text;
 }

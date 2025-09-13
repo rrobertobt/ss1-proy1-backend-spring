@@ -35,10 +35,10 @@ public class TopCustomersResponseDto {
         private CustomerDto customer;
 
         @Schema(description = "Total amount spent", example = "1250.75")
-        private BigDecimal totalSpent;
+        private BigDecimal total_spent;
 
         @Schema(description = "Total number of orders", example = "15")
-        private Integer totalOrders;
+        private Integer total_orders;
 
         @Schema(description = "Average order value", example = "83.38")
         private BigDecimal averageOrderValue;
@@ -59,10 +59,10 @@ public class TopCustomersResponseDto {
         private String username;
 
         @Schema(description = "First name", example = "John")
-        private String firstName;
+        private String first_name;
 
         @Schema(description = "Last name", example = "Doe")
-        private String lastName;
+        private String last_name;
 
         @Schema(description = "Email address", example = "john.doe@example.com")
         private String email;

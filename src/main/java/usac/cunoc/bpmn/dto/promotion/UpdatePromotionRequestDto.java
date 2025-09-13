@@ -27,25 +27,25 @@ public class UpdatePromotionRequestDto {
     @DecimalMin(value = "0.01", message = "Discount percentage must be greater than 0")
     @DecimalMax(value = "100.00", message = "Discount percentage cannot exceed 100")
     @Schema(description = "Discount percentage", example = "20.00", required = true)
-    private BigDecimal discountPercentage;
+    private BigDecimal discount_percentage;
 
     @NotNull(message = "Max items is required")
     @Min(value = 1, message = "Max items must be at least 1")
     @Max(value = 10, message = "Max items cannot exceed 10")
     @Schema(description = "Maximum items allowed in promotion", example = "5", required = true)
-    private Integer maxItems;
+    private Integer max_items;
 
     @Schema(description = "Promotion start date")
-    private LocalDateTime startDate;
+    private LocalDateTime start_date;
 
     @Schema(description = "Promotion end date")
-    private LocalDateTime endDate;
+    private LocalDateTime end_date;
 
     @NotNull(message = "Is active status is required")
     @Schema(description = "Whether promotion is active", example = "true", required = true)
-    private Boolean isActive;
+    private Boolean is_active;
 
     @NotEmpty(message = "Article IDs list cannot be empty")
     @Schema(description = "List of article IDs to include in promotion", example = "[1, 2, 3, 4, 5]", required = true)
-    private List<Integer> articleIds;
+    private List<Integer> article_ids;
 }

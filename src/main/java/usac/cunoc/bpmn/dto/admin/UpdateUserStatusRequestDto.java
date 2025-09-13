@@ -11,13 +11,13 @@ import lombok.Data;
 @Schema(description = "Update user status request data")
 public class UpdateUserStatusRequestDto {
 
-    @NotNull(message = "isActive status is required")
+    @NotNull(message = "is_active status is required")
     @Schema(description = "Whether user account is active", example = "true")
-    private Boolean isActive;
+    private Boolean is_active;
 
-    @NotNull(message = "isBanned status is required")
+    @NotNull(message = "is_banned status is required")
     @Schema(description = "Whether user account is banned", example = "false")
-    private Boolean isBanned;
+    private Boolean is_banned;
 
     @Schema(description = "Reason for status change", example = "Violación de términos de servicio")
     private String reason;

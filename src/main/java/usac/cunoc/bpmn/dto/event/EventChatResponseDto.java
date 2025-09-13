@@ -17,7 +17,7 @@ import java.util.List;
 public class EventChatResponseDto {
 
     @Schema(description = "Event ID", example = "1")
-    private Integer eventId;
+    private Integer event_id;
 
     @Schema(description = "Chat messages")
     private List<MessageDto> messages;
@@ -40,10 +40,10 @@ public class EventChatResponseDto {
         private String message;
 
         @Schema(description = "Whether this is a system message", example = "false")
-        private Boolean isSystemMessage;
+        private Boolean is_system_message;
 
         @Schema(description = "Message sent date and time")
-        private LocalDateTime sentAt;
+        private LocalDateTime sent_at;
     }
 
     @Data
@@ -64,15 +64,15 @@ public class EventChatResponseDto {
     @Schema(description = "Pagination information")
     public static class PaginationDto {
         @Schema(description = "Current page number", example = "1")
-        private Integer currentPage;
+        private Integer current_page;
 
         @Schema(description = "Total number of pages", example = "3")
-        private Integer totalPages;
+        private Integer total_pages;
 
         @Schema(description = "Total number of items", example = "25")
-        private Integer totalItems;
+        private Integer total_items;
 
         @Schema(description = "Items per page", example = "10")
-        private Integer itemsPerPage;
+        private Integer items_per_page;
     }
 }

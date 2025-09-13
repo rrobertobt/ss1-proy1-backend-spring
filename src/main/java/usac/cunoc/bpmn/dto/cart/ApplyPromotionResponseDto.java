@@ -17,14 +17,14 @@ import java.util.List;
 public class ApplyPromotionResponseDto {
 
     @Schema(description = "Promotion ID", example = "1")
-    private Integer promotionId;
+    private Integer promotion_id;
 
     @Schema(description = "List of item IDs that had promotion applied", example = "[15, 16, 17]")
-    private List<Integer> appliedToItems;
+    private List<Integer> applied_to_items;
 
     @Schema(description = "Total discount amount applied", example = "8.99")
-    private BigDecimal totalDiscount;
+    private BigDecimal total_discount;
 
     @Schema(description = "New cart total after promotion", example = "80.98")
-    private BigDecimal newCartTotal;
+    private BigDecimal new_cart_total;
 }

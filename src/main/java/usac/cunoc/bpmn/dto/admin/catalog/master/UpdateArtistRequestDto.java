@@ -27,18 +27,18 @@ public class UpdateArtistRequestDto {
     private String biography;
 
     @Schema(description = "Formation date", example = "1960-08-01", type = "string", format = "date")
-    private LocalDate formationDate;
+    private LocalDate formation_date;
 
     @Schema(description = "Career start date", example = "1960-08-01", type = "string", format = "date")
-    private LocalDate careerStartDate;
+    private LocalDate career_start_date;
 
     @NotNull(message = "Country ID is required")
     @Schema(description = "Country ID", example = "5", required = true)
-    private Integer countryId;
+    private Integer country_id;
 
     @NotNull(message = "Is band field is required")
     @Schema(description = "Whether this is a band or solo artist", example = "true", required = true)
-    private Boolean isBand;
+    private Boolean is_band;
 
     @Size(max = 255, message = "Website cannot exceed 255 characters")
     @Schema(description = "Artist website", example = "https://www.thebeatles.com")

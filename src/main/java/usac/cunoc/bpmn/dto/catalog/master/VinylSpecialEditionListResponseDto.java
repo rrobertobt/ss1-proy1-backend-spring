@@ -33,15 +33,15 @@ public class VinylSpecialEditionListResponseDto {
         private String color;
 
         @Schema(description = "Material description")
-        private String materialDescription;
+        private String material_description;
 
         @Schema(description = "Extra content")
-        private String extraContent;
+        private String extra_content;
 
         @Schema(description = "Is limited edition", example = "true")
-        private Boolean isLimited;
+        private Boolean is_limited;
 
         @Schema(description = "Limited quantity", example = "500")
-        private Integer limitedQuantity;
+        private Integer limited_quantity;
     }
 }

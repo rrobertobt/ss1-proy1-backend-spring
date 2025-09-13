@@ -54,7 +54,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public AddCartItemResponseDto addItemToCart(Integer userId, AddCartItemRequestDto request) {
         // Validate article exists and has sufficient stock
-        AnalogArticle article = analogArticleRepository.findById(request.getArticleId())
+        AnalogArticle article = analogArticleRepository.findById(request.getArticle_id())
                 .orElseThrow(() -> new RuntimeException("Artículo no encontrado"));
 
         if (!article.getIsAvailable()) {
@@ -70,7 +70,7 @@ public class CartServiceImpl implements CartService {
 
         // Check if item already exists in cart
         ShoppingCartItem existingItem = shoppingCartItemRepository
-                .findByCartIdAndArticleId(cart.getId(), request.getArticleId())
+                .findByCartIdAndArticleId(cart.getId(), request.getArticle_id())
                 .orElse(null);
 
         ShoppingCartItem cartItem;
@@ -96,7 +96,7 @@ public class CartServiceImpl implements CartService {
         // Refresh cart to get updated totals (triggers handle this automatically)
         cart = shoppingCartRepository.findById(cart.getId()).orElseThrow();
 
-        log.info("Added item {} to cart {} for user {}", request.getArticleId(), cart.getId(), userId);
+        log.info("Added item {} to cart {} for user {}", request.getArticle_id(), cart.getId(), userId);
 
         return new AddCartItemResponseDto(
                 cart.getId(),
@@ -181,11 +181,11 @@ public class CartServiceImpl implements CartService {
         ShoppingCart cart = getOrCreateCart(userId);
 
         CdPromotion promotion = cdPromotionRepository.findActivePromotionById(
-                request.getPromotionId(), LocalDateTime.now())
+                request.getPromotion_id(), LocalDateTime.now())
                 .orElseThrow(() -> new RuntimeException("Promoción no encontrada o no activa"));
 
         // Validate promotion limits
-        if (request.getArticleIds().size() > promotion.getMaxItems()) {
+        if (request.getArticle_ids().size() > promotion.getMaxItems()) {
             throw new RuntimeException("Promoción permite máximo " + promotion.getMaxItems() + " artículos");
         }
 
@@ -193,7 +193,7 @@ public class CartServiceImpl implements CartService {
         BigDecimal totalDiscount = BigDecimal.ZERO;
 
         // Apply promotion to specified items
-        for (Integer articleId : request.getArticleIds()) {
+        for (Integer articleId : request.getArticle_ids()) {
             ShoppingCartItem cartItem = shoppingCartItemRepository
                     .findByCartIdAndArticleId(cart.getId(), articleId)
                     .orElseThrow(() -> new RuntimeException("Artículo " + articleId + " no está en el carrito"));
@@ -227,7 +227,7 @@ public class CartServiceImpl implements CartService {
                 .collect(Collectors.toList());
 
         log.info("Applied promotion {} to {} items for user {}",
-                request.getPromotionId(), updatedItemIds.size(), userId);
+                request.getPromotion_id(), updatedItemIds.size(), userId);
 
         return new ApplyPromotionResponseDto(
                 promotion.getId(),
@@ -288,7 +288,7 @@ public class CartServiceImpl implements CartService {
             CdPromotion promotion = item.getCdPromotion();
 
             // Create promotion type DTO
-            CartResponseDto.PromotionTypeDto promotionTypeDto = new CartResponseDto.PromotionTypeDto(
+            CartResponseDto.promotion_typeDto promotionTypeDto = new CartResponseDto.promotion_typeDto(
                     promotion.getCdPromotionType().getId(),
                     promotion.getCdPromotionType().getName());
 

@@ -23,31 +23,31 @@ public class CreatePromotionResponseDto {
     private String name;
 
     @Schema(description = "Promotion type details")
-    private PromotionTypeDto promotionType;
+    private promotion_typeDto promotion_type;
 
     @Schema(description = "Discount percentage", example = "15.00")
-    private BigDecimal discountPercentage;
+    private BigDecimal discount_percentage;
 
     @Schema(description = "Maximum items allowed", example = "4")
-    private Integer maxItems;
+    private Integer max_items;
 
     @Schema(description = "Promotion start date")
-    private LocalDateTime startDate;
+    private LocalDateTime start_date;
 
     @Schema(description = "Promotion end date")
-    private LocalDateTime endDate;
+    private LocalDateTime end_date;
 
     @Schema(description = "Whether promotion is active", example = "true")
-    private Boolean isActive;
+    private Boolean is_active;
 
     @Schema(description = "Creation timestamp")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @Schema(description = "Promotion type details")
-    public static class PromotionTypeDto {
+    public static class promotion_typeDto {
 
         @Schema(description = "Promotion type ID", example = "1")
         private Integer id;

@@ -22,5 +22,5 @@ public class UpdatePromotionResponseDto {
     private String name;
 
     @Schema(description = "Update timestamp")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updated_at;
 }

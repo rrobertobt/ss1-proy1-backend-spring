@@ -16,17 +16,17 @@ import java.math.BigDecimal;
 public class UpdateCartItemResponseDto {
 
     @Schema(description = "Cart item ID", example = "15")
-    private Integer itemId;
+    private Integer item_id;
 
     @Schema(description = "New quantity", example = "3")
     private Integer quantity;
 
     @Schema(description = "Unit price", example = "29.99")
-    private BigDecimal unitPrice;
+    private BigDecimal unit_price;
 
     @Schema(description = "Total price for this item", example = "89.97")
-    private BigDecimal totalPrice;
+    private BigDecimal total_price;
 
     @Schema(description = "New cart total", example = "119.96")
-    private BigDecimal newCartTotal;
+    private BigDecimal new_cart_total;
 }

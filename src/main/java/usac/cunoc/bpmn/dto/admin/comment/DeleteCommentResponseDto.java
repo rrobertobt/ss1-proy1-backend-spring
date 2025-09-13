@@ -17,21 +17,21 @@ import java.time.LocalDateTime;
 public class DeleteCommentResponseDto {
 
     @Schema(description = "Deleted comment ID", example = "1")
-    private Integer commentId;
+    private Integer comment_id;
 
     @Schema(description = "Article ID", example = "5")
-    private Integer articleId;
+    private Integer article_id;
 
     @Schema(description = "User ID who owned the comment", example = "10")
-    private Integer userId;
+    private Integer user_id;
 
     @Schema(description = "Reason for deletion", example = "Contenido inapropiado")
     private String reason;
 
     @Schema(description = "Deletion timestamp")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime deletedAt;
+    private LocalDateTime deleted_at;
 
     @Schema(description = "Updated count of deleted comments for the user", example = "1")
-    private Integer userDeletedCommentsCount;
+    private Integer user_deleted_comments_ount;
 }

@@ -15,5 +15,5 @@ import lombok.NoArgsConstructor;
 public class VerifyEmailResponseDto {
 
     @Schema(description = "Whether email has been verified", example = "true")
-    private Boolean isVerified;
+    private Boolean is_verified;
 }

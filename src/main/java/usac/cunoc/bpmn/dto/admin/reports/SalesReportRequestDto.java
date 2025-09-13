@@ -14,12 +14,12 @@ public class SalesReportRequestDto {
 
     @NotNull(message = "Start date is required")
     @Schema(description = "Report start date", example = "2024-01-01")
-    private LocalDate startDate;
+    private LocalDate start_date;
 
     @NotNull(message = "End date is required")
     @Schema(description = "Report end date", example = "2024-01-31")
-    private LocalDate endDate;
+    private LocalDate end_date;
 
     @Schema(description = "Group by criteria", example = "daily", allowableValues = { "daily", "weekly", "monthly" })
-    private String groupBy = "daily";
+    private String group_by = "daily";
 }

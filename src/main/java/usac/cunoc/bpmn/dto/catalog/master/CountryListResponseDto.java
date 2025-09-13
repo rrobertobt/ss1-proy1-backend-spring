@@ -30,7 +30,7 @@ public class CountryListResponseDto {
         private String name;
 
         @Schema(description = "Country code", example = "GT")
-        private String countryCode;
+        private String country_code;
 
         @Schema(description = "Currency information")
         private CurrencyDto currency;

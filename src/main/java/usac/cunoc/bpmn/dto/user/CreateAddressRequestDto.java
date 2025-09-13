@@ -16,11 +16,11 @@ public class CreateAddressRequestDto {
     @NotBlank(message = "Address line 1 is required")
     @Size(max = 255, message = "Address line 1 must not exceed 255 characters")
     @Schema(description = "Primary address line", example = "123 Main Street")
-    private String addressLine1;
+    private String address_line1;
 
     @Size(max = 255, message = "Address line 2 must not exceed 255 characters")
     @Schema(description = "Secondary address line", example = "Apt 4B")
-    private String addressLine2;
+    private String address_line2;
 
     @NotBlank(message = "City is required")
     @Size(max = 100, message = "City must not exceed 100 characters")
@@ -33,18 +33,18 @@ public class CreateAddressRequestDto {
 
     @Size(max = 20, message = "Postal code must not exceed 20 characters")
     @Schema(description = "Postal code", example = "01001")
-    private String postalCode;
+    private String postal_code;
 
     @NotNull(message = "Country ID is required")
     @Schema(description = "Country ID", example = "1")
-    private Integer countryId;
+    private Integer country_id;
 
     @Schema(description = "Set as default address", example = "false")
-    private Boolean isDefault;
+    private Boolean is_default;
 
     @Schema(description = "Set as billing default", example = "false")
-    private Boolean isBillingDefault;
+    private Boolean is_billing_default;
 
     @Schema(description = "Set as shipping default", example = "false")
-    private Boolean isShippingDefault;
+    private Boolean is_shipping_default;
 }

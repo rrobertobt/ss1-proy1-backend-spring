@@ -27,5 +27,5 @@ public class CreateGenreResponseDto {
 
     @Schema(description = "Creation timestamp", example = "2025-01-15T10:30:00")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 }

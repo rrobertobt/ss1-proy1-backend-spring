@@ -21,21 +21,21 @@ public class CreateRatingResponseDto {
     private Integer id;
 
     @Schema(description = "Article ID", example = "1")
-    private Integer articleId;
+    private Integer article_id;
 
     @Schema(description = "User ID", example = "1")
-    private Integer userId;
+    private Integer user_id;
 
     @Schema(description = "Rating value", example = "4")
     private Integer rating;
 
     @Schema(description = "Review text", example = "Excelente álbum, muy recomendado")
-    private String reviewText;
+    private String review_text;
 
     @Schema(description = "Is verified purchase", example = "true")
-    private Boolean isVerifiedPurchase;
+    private Boolean is_verified_purchase;
 
     @Schema(description = "Creation timestamp")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 }

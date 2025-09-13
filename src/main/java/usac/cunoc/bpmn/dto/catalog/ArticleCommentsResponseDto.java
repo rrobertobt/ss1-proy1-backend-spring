@@ -17,10 +17,10 @@ import java.util.List;
 public class ArticleCommentsResponseDto {
 
     @Schema(description = "Article ID", example = "1")
-    private Integer articleId;
+    private Integer article_id;
 
     @Schema(description = "Total comments count", example = "45")
-    private Integer totalComments;
+    private Integer total_comments;
 
     @Schema(description = "List of comments")
     private List<ArticleCommentDto> comments;

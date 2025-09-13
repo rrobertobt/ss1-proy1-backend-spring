@@ -16,8 +16,8 @@ import java.util.List;
 public class Enable2FAResponseDto {
 
     @Schema(description = "Whether 2FA is enabled", example = "true")
-    private Boolean is2faEnabled;
+    private Boolean is_2fa_enabled;
 
     @Schema(description = "Backup codes for 2FA recovery")
-    private List<String> backupCodes;
+    private List<String> backup_codes;
 }

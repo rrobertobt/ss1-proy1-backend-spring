@@ -22,16 +22,16 @@ public class PreorderAudioDownloadResponseDto {
     private Integer audioId;
 
     @Schema(description = "Download URL", example = "https://cdn.example.com/download/audio123")
-    private String downloadUrl;
+    private String download_url;
 
     @Schema(description = "Download URL expiration time")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime expiresAt;
+    private LocalDateTime expires_at;
 
     @Schema(description = "Download status", example = "true")
     private Boolean downloaded;
 
     @Schema(description = "Downloaded timestamp")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime downloadedAt;
+    private LocalDateTime downloaded_at;
 }

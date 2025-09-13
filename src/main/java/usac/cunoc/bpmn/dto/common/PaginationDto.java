@@ -15,14 +15,14 @@ import lombok.NoArgsConstructor;
 public class PaginationDto {
 
     @Schema(description = "Current page number", example = "1")
-    private Integer currentPage;
+    private Integer current_page;
 
     @Schema(description = "Total number of pages", example = "10")
-    private Integer totalPages;
+    private Integer total_pages;
 
     @Schema(description = "Total number of items", example = "95")
-    private Integer totalItems;
+    private Integer total_items;
 
     @Schema(description = "Items per page", example = "10")
-    private Integer itemsPerPage;
+    private Integer items_per_page;
 }

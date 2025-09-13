@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Wishlist service implementation - 100% compliant with database schema and PDF specification
+ * Wishlist service implementation - 100% compliant with database schema and PDF
+ * specification
  * Handles all wishlist operations with proper transaction management
  */
 @Slf4j
@@ -64,21 +65,21 @@ public class WishlistServiceImpl implements WishlistService {
 
     @Override
     public AddWishlistItemResponseDto addItemToWishlist(Integer userId, AddWishlistItemRequestDto request) {
-        log.info("Adding item {} to wishlist for user: {}", request.getArticleId(), userId);
+        log.info("Adding item {} to wishlist for user: {}", request.getArticle_id(), userId);
 
         // Validate user exists
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         // Validate article exists
-        AnalogArticle article = analogArticleRepository.findById(request.getArticleId())
+        AnalogArticle article = analogArticleRepository.findById(request.getArticle_id())
                 .orElseThrow(() -> new RuntimeException("Artículo no encontrado"));
 
         // Get or create wishlist
         Wishlist wishlist = getOrCreateWishlist(user);
 
         // Check if item already exists in wishlist
-        if (wishlistItemRepository.existsByUserIdAndArticleId(userId, request.getArticleId())) {
+        if (wishlistItemRepository.existsByUserIdAndArticleId(userId, request.getArticle_id())) {
             throw new RuntimeException("El artículo ya está en la lista de deseos");
         }
 
@@ -136,8 +137,8 @@ public class WishlistServiceImpl implements WishlistService {
 
     @Override
     public WishlistPreorderPaymentResponseDto processPreorderPayment(Integer itemId,
-                                                                      WishlistPreorderPaymentRequestDto request,
-                                                                      Integer userId) {
+            WishlistPreorderPaymentRequestDto request,
+            Integer userId) {
         log.info("Processing preorder payment for wishlist item {} by user: {}", itemId, userId);
 
         // Find item and validate user ownership
@@ -157,7 +158,7 @@ public class WishlistServiceImpl implements WishlistService {
         }
 
         // Validate payment method
-        PaymentMethod paymentMethod = paymentMethodRepository.findById(request.getPaymentMethodId())
+        PaymentMethod paymentMethod = paymentMethodRepository.findById(request.getPayment_method_id())
                 .orElseThrow(() -> new RuntimeException("Método de pago no encontrado"));
 
         // Get pending payment status

@@ -22,10 +22,10 @@ public class PaymentDto {
     private Integer id;
 
     @Schema(description = "Payment number", example = "PAY-2025-001234")
-    private String paymentNumber;
+    private String payment_number;
 
     @Schema(description = "Payment method name", example = "Tarjeta de Credito")
-    private String paymentMethod;
+    private String payment_method;
 
     @Schema(description = "Payment status information")
     private StatusDto status;
@@ -37,17 +37,17 @@ public class PaymentDto {
     private BigDecimal amount;
 
     @Schema(description = "Transaction reference", example = "TXN123456789")
-    private String transactionReference;
+    private String transaction_reference;
 
     @Schema(description = "Gateway transaction ID", example = "GTW789123456")
-    private String gatewayTransactionId;
+    private String gateway_transaction_id;
 
     @Schema(description = "Refunded amount", example = "0.00")
-    private BigDecimal refundedAmount;
+    private BigDecimal refunded_amount;
 
     @Schema(description = "Payment processing timestamp", example = "2025-09-08T10:35:00")
-    private LocalDateTime processedAt;
+    private LocalDateTime processed_at;
 
     @Schema(description = "Payment creation timestamp", example = "2025-09-08T10:30:00")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 }

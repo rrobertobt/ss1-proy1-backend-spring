@@ -16,11 +16,11 @@ import java.math.BigDecimal;
 public class RemoveCartItemResponseDto {
 
     @Schema(description = "Removed item ID", example = "15")
-    private Integer removedItemId;
+    private Integer removed_item_id;
 
     @Schema(description = "New cart total", example = "29.99")
-    private BigDecimal newCartTotal;
+    private BigDecimal new_cart_total;
 
     @Schema(description = "New item count", example = "1")
-    private Integer newItemCount;
+    private Integer new_item_count;
 }

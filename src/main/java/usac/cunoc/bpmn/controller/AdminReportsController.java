@@ -43,9 +43,9 @@ public class AdminReportsController {
                         @Parameter(description = "Group by criteria", example = "daily") @RequestParam(defaultValue = "daily") String groupBy) {
 
                 SalesReportRequestDto request = new SalesReportRequestDto();
-                request.setStartDate(startDate);
-                request.setEndDate(endDate);
-                request.setGroupBy(groupBy);
+                request.setStart_date(startDate);
+                request.setEnd_date(endDate);
+                request.setGroup_by(groupBy);
 
                 SalesReportResponseDto response = adminReportsService.getSalesReport(request);
                 return ResponseEntity.ok(ApiResponseDto.success("Reporte de ventas generado exitosamente", response));
@@ -109,7 +109,7 @@ public class AdminReportsController {
                         @Parameter(description = "Maximum number of articles to return", example = "10") @RequestParam(defaultValue = "10") Integer limit) {
 
                 TopRatedRequestDto request = new TopRatedRequestDto();
-                request.setMinRatings(minRatings);
+                request.setMin_ratings(minRatings);
                 request.setLimit(limit);
 
                 TopRatedResponseDto response = adminReportsService.getTopRatedArticles(request);

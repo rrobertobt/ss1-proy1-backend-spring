@@ -24,27 +24,27 @@ public class ArticleCommentDto {
     private UserDto user;
 
     @Schema(description = "Comment text")
-    private String commentText;
+    private String comment_text;
 
     @Schema(description = "Parent comment ID", example = "null")
-    private Integer parentCommentId;
+    private Integer parent_comment_id;
 
     @Schema(description = "Comment status information")
     private StatusDto status;
 
     @Schema(description = "Likes count", example = "15")
-    private Integer likesCount;
+    private Integer likes_count;
 
     @Schema(description = "List of replies")
     private List<ArticleCommentDto> replies;
 
     @Schema(description = "Comment creation date")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 
     @Schema(description = "Comment last update date")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updated_at;
 
     @Data
     @NoArgsConstructor

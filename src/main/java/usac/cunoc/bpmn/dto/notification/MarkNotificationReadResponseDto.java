@@ -17,11 +17,11 @@ import java.time.LocalDateTime;
 public class MarkNotificationReadResponseDto {
 
     @Schema(description = "Notification ID", example = "1")
-    private Integer notificationId;
+    private Integer notification_id;
 
     @Schema(description = "Whether notification is read", example = "true")
-    private Boolean isRead;
+    private Boolean is_read;
 
     @Schema(description = "Timestamp when notification was marked as read")
-    private LocalDateTime readAt;
+    private LocalDateTime read_at;
 }

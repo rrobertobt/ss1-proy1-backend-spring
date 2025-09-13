@@ -40,28 +40,28 @@ public class EventListResponseDto {
         private ArticleDto article;
 
         @Schema(description = "Event start date and time")
-        private LocalDateTime startDatetime;
+        private LocalDateTime start_datetime;
 
         @Schema(description = "Event end date and time")
-        private LocalDateTime endDatetime;
+        private LocalDateTime end_datetime;
 
         @Schema(description = "Audio duration in seconds", example = "3600")
         private Integer duration;
 
         @Schema(description = "Maximum number of participants", example = "100")
-        private Integer maxParticipants;
+        private Integer max_participants;
 
         @Schema(description = "Current number of participants", example = "45")
-        private Integer currentParticipants;
+        private Integer current_participants;
 
         @Schema(description = "Event status", example = "Programado")
         private String status;
 
         @Schema(description = "Whether chat is allowed", example = "true")
-        private Boolean allowChat;
+        private Boolean allow_chat;
 
         @Schema(description = "Whether current user is registered", example = "false")
-        private Boolean isRegistered;
+        private Boolean is_registered;
     }
 
     @Data
@@ -79,7 +79,7 @@ public class EventListResponseDto {
         private String artist;
 
         @Schema(description = "Article image URL")
-        private String imageUrl;
+        private String image_url;
     }
 
     @Data
@@ -88,15 +88,15 @@ public class EventListResponseDto {
     @Schema(description = "Pagination information")
     public static class PaginationDto {
         @Schema(description = "Current page number", example = "1")
-        private Integer currentPage;
+        private Integer current_page;
 
         @Schema(description = "Total number of pages", example = "5")
-        private Integer totalPages;
+        private Integer total_pages;
 
         @Schema(description = "Total number of items", example = "48")
-        private Integer totalItems;
+        private Integer total_items;
 
         @Schema(description = "Items per page", example = "10")
-        private Integer itemsPerPage;
+        private Integer items_per_page;
     }
 }

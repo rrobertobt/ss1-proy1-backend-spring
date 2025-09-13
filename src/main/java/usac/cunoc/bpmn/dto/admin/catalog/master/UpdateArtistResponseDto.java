@@ -24,5 +24,5 @@ public class UpdateArtistResponseDto {
 
     @Schema(description = "Update timestamp", example = "2025-01-15T10:30:00")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updated_at;
 }

@@ -21,40 +21,40 @@ import java.util.List;
 public class ProcessPaymentResponseDto {
 
     @Schema(description = "Invoice number", example = "INV-20250908142530-ABC123")
-    private String invoiceNumber;
+    private String invoice_number;
 
     @Schema(description = "Order ID", example = "1")
-    private Integer orderId;
+    private Integer order_id;
 
     @Schema(description = "Order number", example = "ORD-20250908142530-DEF456")
-    private String orderNumber;
+    private String order_number;
 
     @Schema(description = "Invoice issue date")
-    private LocalDate issueDate;
+    private LocalDate issue_date;
 
     @Schema(description = "Invoice due date")
-    private LocalDate dueDate;
+    private LocalDate due_date;
 
     @Schema(description = "Subtotal amount", example = "125.50")
     private BigDecimal subtotal;
 
     @Schema(description = "Tax amount", example = "15.06")
-    private BigDecimal taxAmount;
+    private BigDecimal tax_amount;
 
     @Schema(description = "Total amount", example = "140.56")
-    private BigDecimal totalAmount;
+    private BigDecimal total_amount;
 
     @Schema(description = "Currency information")
     private CurrencyDto currency;
 
     @Schema(description = "PDF download URL", example = "/api/v1/invoices/1/pdf")
-    private String pdfUrl;
+    private String pdf_url;
 
     @Schema(description = "Customer information")
     private CustomerDto customer;
 
     @Schema(description = "Billing address")
-    private UserAddressDto billingAddress;
+    private UserAddressDto billing_address;
 
     @Schema(description = "Order items")
     private List<OrderItemDto> items;
@@ -65,10 +65,10 @@ public class ProcessPaymentResponseDto {
     @Schema(description = "Customer information")
     public static class CustomerDto {
         @Schema(description = "Customer first name", example = "John")
-        private String firstName;
+        private String first_name;
 
         @Schema(description = "Customer last name", example = "Doe")
-        private String lastName;
+        private String last_name;
 
         @Schema(description = "Customer email", example = "john.doe@example.com")
         private String email;

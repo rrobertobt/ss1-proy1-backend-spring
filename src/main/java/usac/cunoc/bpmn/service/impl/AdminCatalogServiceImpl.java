@@ -63,13 +63,13 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     @Transactional
     public CreateArticleResponseDto createArticle(CreateArticleRequestDto request, Integer adminUserId) {
         // Validate required entities exist
-        Artist artist = artistRepository.findById(request.getArtistId())
+        Artist artist = artistRepository.findById(request.getArtist_id())
                 .orElseThrow(() -> new RuntimeException("Artista no encontrado"));
 
-        MusicGenre genre = musicGenreRepository.findById(request.getMusicGenreId())
+        MusicGenre genre = musicGenreRepository.findById(request.getMusic_genre_id())
                 .orElseThrow(() -> new RuntimeException("Género musical no encontrado"));
 
-        Currency currency = currencyRepository.findById(request.getCurrencyId())
+        Currency currency = currencyRepository.findById(request.getCurrency_id())
                 .orElseThrow(() -> new RuntimeException("Moneda no encontrada"));
 
         // Create main article
@@ -79,30 +79,30 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         article.setPrice(request.getPrice());
         article.setCurrency(currency);
         article.setMusicGenre(genre);
-        article.setReleaseDate(request.getReleaseDate());
+        article.setReleaseDate(request.getRelease_date());
         article.setDescription(request.getDescription());
         article.setDimensions(request.getDimensions());
-        article.setWeightGrams(request.getWeightGrams());
+        article.setWeightGrams(request.getWeight_grams());
         article.setBarcode(request.getBarcode());
-        article.setStockQuantity(request.getStockQuantity());
-        article.setMinStockLevel(request.getMinStockLevel());
-        article.setMaxStockLevel(request.getMaxStockLevel());
-        article.setIsAvailable(request.getIsAvailable());
-        article.setIsPreorder(request.getIsPreorder());
-        article.setPreorderReleaseDate(request.getPreorderReleaseDate());
-        article.setPreorderEndDate(request.getPreorderEndDate());
-        article.setImageUrl(request.getImageUrl());
+        article.setStockQuantity(request.getStock_quantity());
+        article.setMinStockLevel(request.getMin_stock_level());
+        article.setMaxStockLevel(request.getMax_stock_level());
+        article.setIsAvailable(request.getIs_available());
+        article.setIsPreorder(request.getIs_preorder());
+        article.setPreorderReleaseDate(request.getPre_order_release_date());
+        article.setPreorderEndDate(request.getPre_order_release_date());
+        article.setImageUrl(request.getImage_url());
 
         // Save main article
         AnalogArticle savedArticle = analogArticleRepository.save(article);
         log.info("Created analog article with ID: {}", savedArticle.getId());
 
         // Create type-specific record
-        createTypeSpecificRecord(savedArticle, request.getType(), request.getTypeDetails());
+        createTypeSpecificRecord(savedArticle, request.getType(), request.getType_details());
 
         // Create initial stock movement if stock > 0
-        if (request.getStockQuantity() > 0) {
-            createInitialStockMovement(savedArticle, request.getStockQuantity(), adminUserId);
+        if (request.getStock_quantity() > 0) {
+            createInitialStockMovement(savedArticle, request.getStock_quantity(), adminUserId);
         }
 
         return new CreateArticleResponseDto(
@@ -125,13 +125,13 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
                 .orElseThrow(() -> new RuntimeException("Artículo no encontrado"));
 
         // Validate required entities
-        Artist artist = artistRepository.findById(request.getArtistId())
+        Artist artist = artistRepository.findById(request.getArtist_id())
                 .orElseThrow(() -> new RuntimeException("Artista no encontrado"));
 
-        MusicGenre genre = musicGenreRepository.findById(request.getMusicGenreId())
+        MusicGenre genre = musicGenreRepository.findById(request.getMusic_genre_id())
                 .orElseThrow(() -> new RuntimeException("Género musical no encontrado"));
 
-        Currency currency = currencyRepository.findById(request.getCurrencyId())
+        Currency currency = currencyRepository.findById(request.getCurrency_id())
                 .orElseThrow(() -> new RuntimeException("Moneda no encontrada"));
 
         // Update fields
@@ -140,18 +140,18 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         article.setPrice(request.getPrice());
         article.setCurrency(currency);
         article.setMusicGenre(genre);
-        article.setReleaseDate(request.getReleaseDate());
+        article.setReleaseDate(request.getRelease_date());
         article.setDescription(request.getDescription());
         article.setDimensions(request.getDimensions());
-        article.setWeightGrams(request.getWeightGrams());
+        article.setWeightGrams(request.getWeight_grams());
         article.setBarcode(request.getBarcode());
-        article.setMinStockLevel(request.getMinStockLevel());
-        article.setMaxStockLevel(request.getMaxStockLevel());
-        article.setIsAvailable(request.getIsAvailable());
-        article.setIsPreorder(request.getIsPreorder());
-        article.setPreorderReleaseDate(request.getPreorderReleaseDate());
-        article.setPreorderEndDate(request.getPreorderEndDate());
-        article.setImageUrl(request.getImageUrl());
+        article.setMinStockLevel(request.getMin_stock_level());
+        article.setMaxStockLevel(request.getMax_stock_level());
+        article.setIsAvailable(request.getIs_available());
+        article.setIsPreorder(request.getIs_preorder());
+        article.setPreorderReleaseDate(request.getPre_order_release_date());
+        article.setPreorderEndDate(request.getPre_order_release_date());
+        article.setImageUrl(request.getImage_url());
 
         analogArticleRepository.save(article);
         log.info("Updated article with ID: {}", articleId);
@@ -195,14 +195,14 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
                 .orElseThrow(() -> new RuntimeException("Usuario administrador no encontrado"));
 
         // Get movement type (Entrada/Salida)
-        MovementType movementType = movementTypeRepository.findByName(request.getMovementType())
+        MovementType movementType = movementTypeRepository.findByName(request.getMovement_type())
                 .orElseThrow(
-                        () -> new RuntimeException("Tipo de movimiento no encontrado: " + request.getMovementType()));
+                        () -> new RuntimeException("Tipo de movimiento no encontrado: " + request.getMovement_type()));
 
         // Get movement reference type
-        MovementReferenceType referenceType = movementReferenceTypeRepository.findByName(request.getReferenceType())
+        MovementReferenceType referenceType = movementReferenceTypeRepository.findByName(request.getReference_type())
                 .orElseThrow(
-                        () -> new RuntimeException("Tipo de referencia no encontrado: " + request.getReferenceType()));
+                        () -> new RuntimeException("Tipo de referencia no encontrado: " + request.getReference_type()));
 
         // Create stock movement (triggers will update stock automatically)
         StockMovement movement = new StockMovement();
@@ -210,7 +210,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         movement.setMovementType(movementType);
         movement.setMovementReferenceType(referenceType);
         movement.setQuantity(request.getQuantity());
-        movement.setReferenceId(request.getReferenceId());
+        movement.setReferenceId(request.getReference_id());
         movement.setNotes(request.getNotes());
         movement.setCreatedByUser(adminUser);
 
@@ -431,14 +431,14 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         StockMovementListResponseDto.StockMovementItemDto dto = new StockMovementListResponseDto.StockMovementItemDto();
 
         dto.setId(movement.getId());
-        dto.setMovementType(movement.getMovementType().getName());
+        dto.setMovement_type(movement.getMovementType().getName());
         dto.setQuantity(movement.getQuantity());
-        dto.setPreviousStock(movement.getPreviousStock());
-        dto.setNewStock(movement.getNewStock());
-        dto.setReferenceType(movement.getMovementReferenceType().getName());
-        dto.setReferenceId(movement.getReferenceId());
+        dto.setPrevious_stock(movement.getPreviousStock());
+        dto.setNew_stock(movement.getNewStock());
+        dto.setReference_type(movement.getMovementReferenceType().getName());
+        dto.setReference_id(movement.getReferenceId());
         dto.setNotes(movement.getNotes());
-        dto.setCreatedAt(movement.getCreatedAt());
+        dto.setCreated_at(movement.getCreatedAt());
 
         // Article info
         if (movement.getAnalogArticle() != null) {
@@ -454,7 +454,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
 
         // User info
         if (movement.getCreatedByUser() != null) {
-            dto.setCreatedBy(new StockMovementListResponseDto.UserInfoDto(
+            dto.setCreated_by(new StockMovementListResponseDto.UserInfoDto(
                     movement.getCreatedByUser().getId(),
                     movement.getCreatedByUser().getUsername()));
         }

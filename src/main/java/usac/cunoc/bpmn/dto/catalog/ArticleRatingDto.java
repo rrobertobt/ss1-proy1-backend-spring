@@ -26,21 +26,21 @@ public class ArticleRatingDto {
     private Integer rating;
 
     @Schema(description = "Review text")
-    private String reviewText;
+    private String review_text;
 
     @Schema(description = "Is verified purchase", example = "true")
-    private Boolean isVerifiedPurchase;
+    private Boolean is_verified_purchase;
 
     @Schema(description = "Helpful votes count", example = "8")
-    private Integer helpfulVotes;
+    private Integer helpful_votes;
 
     @Schema(description = "Rating creation date")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 
     @Schema(description = "Rating last update date")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updated_at;
 
     @Data
     @NoArgsConstructor

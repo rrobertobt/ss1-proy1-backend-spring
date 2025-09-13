@@ -23,16 +23,16 @@ public class WishlistResponseDto {
     private Integer id;
 
     @Schema(description = "Total number of items in wishlist", example = "3")
-    private Integer totalItems;
+    private Integer total_items;
 
     @Schema(description = "List of wishlist items")
     private List<WishlistItemDto> items;
 
     @Schema(description = "Wishlist creation timestamp", example = "2024-03-10T09:00:00")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 
     @Schema(description = "Wishlist last update timestamp", example = "2024-03-15T10:30:00")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updated_at;
 
     /**
      * Nested DTO for wishlist items matching PDF structure
@@ -50,13 +50,13 @@ public class WishlistResponseDto {
         private ArticleDto article;
 
         @Schema(description = "Whether preorder is paid", example = "false")
-        private Boolean isPreorderPaid;
+        private Boolean is_preorder_paid;
 
         @Schema(description = "Whether notification was sent", example = "false")
-        private Boolean notificationSent;
+        private Boolean notification_sent;
 
         @Schema(description = "Item creation timestamp", example = "2024-03-15T10:30:00")
-        private LocalDateTime createdAt;
+        private LocalDateTime created_at;
     }
 
     /**
@@ -87,16 +87,16 @@ public class WishlistResponseDto {
         private CurrencyDto currency;
 
         @Schema(description = "Article image URL", example = "https://example.com/image.jpg")
-        private String imageUrl;
+        private String image_url;
 
         @Schema(description = "Whether article is available", example = "true")
-        private Boolean isAvailable;
+        private Boolean is_available;
 
         @Schema(description = "Whether article is preorder", example = "false")
-        private Boolean isPreorder;
+        private Boolean is_preorder;
 
         @Schema(description = "Stock quantity", example = "15")
-        private Integer stockQuantity;
+        private Integer stock_quantity;
     }
 
     /**

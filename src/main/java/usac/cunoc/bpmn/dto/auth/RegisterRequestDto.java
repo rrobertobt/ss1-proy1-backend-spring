@@ -32,21 +32,21 @@ public class RegisterRequestDto {
     @NotBlank(message = "First name is required")
     @Size(max = 100, message = "First name must not exceed 100 characters")
     @Schema(description = "User first name", example = "John")
-    private String firstName;
+    private String first_name;
 
     @NotBlank(message = "Last name is required")
     @Size(max = 100, message = "Last name must not exceed 100 characters")
     @Schema(description = "User last name", example = "Doe")
-    private String lastName;
+    private String last_name;
 
     @Min(value = 1, message = "Invalid gender ID")
     @Schema(description = "Gender ID (1=Masculino, 2=Femenino, 3=Otro)", example = "1")
-    private Integer genderId;
+    private Integer gender_id;
 
     @Past(message = "Birth date must be in the past")
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Schema(description = "User birth date", example = "1990-05-15", type = "string", format = "date")
-    private LocalDate birthDate;
+    private LocalDate birth_date;
 
     @Size(max = 20, message = "Phone must not exceed 20 characters")
     @Schema(description = "User phone number", example = "+50212345678")

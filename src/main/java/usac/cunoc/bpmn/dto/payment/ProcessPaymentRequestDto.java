@@ -19,15 +19,15 @@ public class ProcessPaymentRequestDto {
 
     @NotNull(message = "Order ID is required")
     @Schema(description = "Order ID to process payment for", example = "1")
-    private Integer orderId;
+    private Integer order_id;
 
     @NotNull(message = "Payment method ID is required")
     @Schema(description = "Payment method ID", example = "1")
-    private Integer paymentMethodId;
+    private Integer payment_method_id;
 
     @NotNull(message = "Card ID is required")
     @Schema(description = "Credit card ID", example = "1")
-    private Integer cardId;
+    private Integer card_id;
 
     @NotNull(message = "Amount is required")
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0")

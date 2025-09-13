@@ -29,13 +29,13 @@ public class AdminReportsServiceImpl implements AdminReportsService {
     @Override
     public SalesReportResponseDto getSalesReport(SalesReportRequestDto request) {
         log.info("Generating sales report from {} to {} grouped by {}",
-                request.getStartDate(), request.getEndDate(), request.getGroupBy());
+                request.getStart_date(), request.getEnd_date(), request.getGroup_by());
 
-        validateDateRange(request.getStartDate(), request.getEndDate());
-        validateGroupBy(request.getGroupBy());
+        validateDateRange(request.getStart_date(), request.getEnd_date());
+        validateGroupBy(request.getGroup_by());
 
-        LocalDateTime startDateTime = request.getStartDate().atStartOfDay();
-        LocalDateTime endDateTime = request.getEndDate().atTime(23, 59, 59);
+        LocalDateTime startDateTime = request.getStart_date().atStartOfDay();
+        LocalDateTime endDateTime = request.getEnd_date().atTime(23, 59, 59);
 
         try {
             // Get summary data
@@ -44,7 +44,7 @@ public class AdminReportsServiceImpl implements AdminReportsService {
 
             // Get period breakdown
             List<Object[]> periodData = adminReportsRepository.getSalesByPeriod(
-                    startDateTime, endDateTime, request.getGroupBy());
+                    startDateTime, endDateTime, request.getGroup_by());
             List<SalesReportResponseDto.PeriodSalesDto> salesByPeriod = buildPeriodSales(periodData);
 
             // Get type breakdown
@@ -53,7 +53,7 @@ public class AdminReportsServiceImpl implements AdminReportsService {
 
             // Build period configuration
             SalesReportResponseDto.PeriodDto period = new SalesReportResponseDto.PeriodDto(
-                    request.getStartDate(), request.getEndDate(), request.getGroupBy());
+                    request.getStart_date(), request.getEnd_date(), request.getGroup_by());
 
             return new SalesReportResponseDto(period, summary, salesByPeriod, salesByType);
         } catch (Exception e) {
@@ -118,14 +118,14 @@ public class AdminReportsServiceImpl implements AdminReportsService {
     @Override
     public TopRatedResponseDto getTopRatedArticles(TopRatedRequestDto request) {
         log.info("Generating top rated articles report with min ratings: {}, limit: {}",
-                request.getMinRatings(), request.getLimit());
+                request.getMin_ratings(), request.getLimit());
 
-        validateMinRatings(request.getMinRatings());
+        validateMinRatings(request.getMin_ratings());
         validateLimit(request.getLimit());
 
         try {
             List<Object[]> articlesData = adminReportsRepository.getTopRatedArticles(
-                    request.getMinRatings(), request.getLimit());
+                    request.getMin_ratings(), request.getLimit());
 
             List<TopRatedResponseDto.TopRatedArticleDto> topRatedArticles = new ArrayList<>();
             for (int i = 0; i < articlesData.size(); i++) {
@@ -137,7 +137,7 @@ public class AdminReportsServiceImpl implements AdminReportsService {
             }
 
             TopRatedResponseDto.CriteriaDto criteria = new TopRatedResponseDto.CriteriaDto(
-                    request.getMinRatings(), request.getLimit());
+                    request.getMin_ratings(), request.getLimit());
 
             return new TopRatedResponseDto(criteria, topRatedArticles);
         } catch (Exception e) {

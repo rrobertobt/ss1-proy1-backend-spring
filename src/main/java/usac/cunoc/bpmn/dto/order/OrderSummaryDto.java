@@ -22,26 +22,26 @@ public class OrderSummaryDto {
     private Integer id;
 
     @Schema(description = "Order number", example = "ORD-2025-001234")
-    private String orderNumber;
+    private String order_number;
 
     @Schema(description = "Order status information")
     private StatusDto status;
 
     @Schema(description = "Total order amount", example = "125.50")
-    private BigDecimal totalAmount;
+    private BigDecimal total_amount;
 
     @Schema(description = "Currency information")
     private CurrencyDto currency;
 
     @Schema(description = "Total number of items", example = "3")
-    private Integer totalItems;
+    private Integer total_items;
 
     @Schema(description = "Order creation timestamp", example = "2025-09-08T10:30:00")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 
     @Schema(description = "Order shipped timestamp", example = "2025-09-09T14:20:00")
-    private LocalDateTime shippedAt;
+    private LocalDateTime shipped_at;
 
     @Schema(description = "Order delivered timestamp", example = "2025-09-10T16:45:00")
-    private LocalDateTime deliveredAt;
+    private LocalDateTime delivered_at;
 }

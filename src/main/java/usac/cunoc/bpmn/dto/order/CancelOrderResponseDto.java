@@ -16,14 +16,14 @@ import java.time.LocalDateTime;
 public class CancelOrderResponseDto {
 
     @Schema(description = "Order ID", example = "1")
-    private Integer orderId;
+    private Integer order_id;
 
     @Schema(description = "Order number", example = "ORD-2025-001234")
-    private String orderNumber;
+    private String order_number;
 
     @Schema(description = "New order status", example = "Cancelado")
     private String status;
 
     @Schema(description = "Cancellation timestamp", example = "2025-09-08T15:30:00")
-    private LocalDateTime cancelledAt;
+    private LocalDateTime cancelled_at;
 }

@@ -38,7 +38,7 @@ public class CatalogArticlesResponseDto {
         private List<ArtistFilterDto> artists;
 
         @Schema(description = "Price range")
-        private PriceRangeDto priceRange;
+        private PriceRangeDto price_range;
     }
 
     @Data

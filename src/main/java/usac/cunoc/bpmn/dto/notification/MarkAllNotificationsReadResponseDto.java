@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 public class MarkAllNotificationsReadResponseDto {
 
     @Schema(description = "Count of notifications marked as read", example = "15")
-    private Integer updatedCount;
+    private Integer updated_count;
 
     @Schema(description = "Current unread count after operation", example = "0")
-    private Integer unreadCount;
+    private Integer unread_count;
 }

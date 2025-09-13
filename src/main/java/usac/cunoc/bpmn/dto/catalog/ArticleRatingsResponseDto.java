@@ -19,16 +19,16 @@ import java.util.Map;
 public class ArticleRatingsResponseDto {
 
     @Schema(description = "Article ID", example = "1")
-    private Integer articleId;
+    private Integer article_id;
 
     @Schema(description = "Average rating", example = "4.25")
-    private BigDecimal averageRating;
+    private BigDecimal average_rating;
 
     @Schema(description = "Total ratings count", example = "128")
-    private Integer totalRatings;
+    private Integer total_ratings;
 
     @Schema(description = "Rating distribution by stars")
-    private Map<String, Integer> ratingDistribution;
+    private Map<String, Integer> rating_distribution;
 
     @Schema(description = "List of ratings")
     private List<ArticleRatingDto> ratings;

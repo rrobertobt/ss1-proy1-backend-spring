@@ -25,35 +25,35 @@ public class UpdateEventRequestDto {
     private String description;
 
     @Schema(description = "Associated article ID", example = "1")
-    private Integer articleId;
+    private Integer article_id;
 
     @Size(max = 500, message = "Audio file URL cannot exceed 500 characters")
     @Schema(description = "Audio file URL")
-    private String audioFileUrl;
+    private String audio_file_url;
 
     @Positive(message = "Audio duration must be positive")
     @Schema(description = "Audio duration in seconds", example = "3600")
-    private Integer audioDuration;
+    private Integer audio_duration;
 
     @Schema(description = "Event start date and time")
-    private LocalDateTime startDatetime;
+    private LocalDateTime start_datetime;
 
     @Schema(description = "Event end date and time")
-    private LocalDateTime endDatetime;
+    private LocalDateTime end_datetime;
 
     @Positive(message = "Max participants must be positive")
     @Schema(description = "Maximum number of participants", example = "100")
-    private Integer maxParticipants;
+    private Integer max_participants;
 
     @Schema(description = "Whether chat is allowed", example = "true")
-    private Boolean allowChat;
+    private Boolean allow_chat;
 
     // Custom validation to ensure end is after start when both are provided
     @AssertTrue(message = "End datetime must be after start datetime")
     public boolean isEndAfterStart() {
-        if (startDatetime == null || endDatetime == null) {
+        if (start_datetime == null || end_datetime == null) {
             return true; // Skip validation if either is null
         }
-        return endDatetime.isAfter(startDatetime);
+        return end_datetime.isAfter(start_datetime);
     }
 }

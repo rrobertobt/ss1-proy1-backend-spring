@@ -13,5 +13,5 @@ public class LogoutRequestDto {
 
     @NotBlank(message = "Refresh token is required")
     @Schema(description = "JWT refresh token to invalidate")
-    private String refreshToken;
+    private String refresh_token;
 }

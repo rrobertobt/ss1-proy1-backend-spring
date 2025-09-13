@@ -34,13 +34,13 @@ public class TopArticlesResponseDto {
         private ArticleDto article;
 
         @Schema(description = "Total units sold", example = "45")
-        private Integer totalSold;
+        private Integer total_sold;
 
         @Schema(description = "Total revenue generated", example = "2250.75")
         private BigDecimal totalRevenue;
 
         @Schema(description = "Average rating", example = "4.5")
-        private BigDecimal averageRating;
+        private BigDecimal average_rating;
     }
 
     @Data
@@ -61,6 +61,6 @@ public class TopArticlesResponseDto {
         private String type;
 
         @Schema(description = "Article image URL", example = "https://example.com/image.jpg")
-        private String imageUrl;
+        private String image_url;
     }
 }

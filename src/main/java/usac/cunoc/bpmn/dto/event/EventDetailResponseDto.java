@@ -32,37 +32,37 @@ public class EventDetailResponseDto {
     private ArticleDto article;
 
     @Schema(description = "Audio file URL")
-    private String audioFileUrl;
+    private String audio_file_url;
 
     @Schema(description = "Audio duration in seconds", example = "3600")
-    private Integer audioDuration;
+    private Integer audio_duration;
 
     @Schema(description = "Event start date and time")
-    private LocalDateTime startDatetime;
+    private LocalDateTime start_datetime;
 
     @Schema(description = "Event end date and time")
-    private LocalDateTime endDatetime;
+    private LocalDateTime end_datetime;
 
     @Schema(description = "Maximum number of participants", example = "100")
-    private Integer maxParticipants;
+    private Integer max_participants;
 
     @Schema(description = "Current number of participants", example = "45")
-    private Integer currentParticipants;
+    private Integer current_participants;
 
     @Schema(description = "Whether chat is allowed", example = "true")
-    private Boolean allowChat;
+    private Boolean allow_chat;
 
     @Schema(description = "User who created the event")
-    private CreatedByDto createdBy;
+    private CreatedByDto created_by;
 
     @Schema(description = "Whether current user is registered", example = "false")
-    private Boolean isRegistered;
+    private Boolean is_registered;
 
     @Schema(description = "List of registered participants")
-    private List<ParticipantDto> registeredParticipants;
+    private List<ParticipantDto> registered_participants;
 
     @Schema(description = "Event creation date")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 
     @Data
     @NoArgsConstructor
@@ -76,7 +76,7 @@ public class EventDetailResponseDto {
         private String name;
 
         @Schema(description = "Whether registration is allowed", example = "true")
-        private Boolean allowsRegistration;
+        private Boolean allows_registration;
     }
 
     @Data
@@ -94,7 +94,7 @@ public class EventDetailResponseDto {
         private ArtistDto artist;
 
         @Schema(description = "Article image URL")
-        private String imageUrl;
+        private String image_url;
     }
 
     @Data
@@ -127,12 +127,12 @@ public class EventDetailResponseDto {
     @Schema(description = "Registered participant information")
     public static class ParticipantDto {
         @Schema(description = "User ID", example = "2")
-        private Integer userId;
+        private Integer user_id;
 
         @Schema(description = "Username", example = "johndoe")
         private String username;
 
         @Schema(description = "Registration date and time")
-        private LocalDateTime registeredAt;
+        private LocalDateTime registered_at;
     }
 }

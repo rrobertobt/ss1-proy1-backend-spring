@@ -16,23 +16,23 @@ import java.math.BigDecimal;
 public class AddCartItemResponseDto {
 
     @Schema(description = "Cart ID", example = "1")
-    private Integer cartId;
+    private Integer cart_id;
 
     @Schema(description = "Cart item ID", example = "15")
-    private Integer itemId;
+    private Integer item_id;
 
     @Schema(description = "Article ID", example = "5")
-    private Integer articleId;
+    private Integer article_id;
 
     @Schema(description = "Quantity added", example = "2")
     private Integer quantity;
 
     @Schema(description = "Unit price", example = "29.99")
-    private BigDecimal unitPrice;
+    private BigDecimal unit_price;
 
     @Schema(description = "Total price for this item", example = "59.98")
-    private BigDecimal totalPrice;
+    private BigDecimal total_price;
 
     @Schema(description = "New cart total", example = "89.97")
-    private BigDecimal newCartTotal;
+    private BigDecimal new_cart_total;
 }

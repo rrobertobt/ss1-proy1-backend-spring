@@ -27,5 +27,5 @@ public class CreateArticleResponseDto {
 
     @Schema(description = "Creation timestamp")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 }

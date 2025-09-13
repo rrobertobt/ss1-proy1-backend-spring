@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 /**
  * Response DTO for updating article rating
  * Matches PDF specification exactly for PUT
- * /api/v1/articles/{articleId}/ratings/{id}
+ * /api/v1/articles/{article_id}/ratings/{id}
  */
 @Data
 @NoArgsConstructor
@@ -25,9 +25,9 @@ public class UpdateRatingResponseDto {
     private Integer rating;
 
     @Schema(description = "Updated review text", example = "Actualización del review: aún mejor que antes")
-    private String reviewText;
+    private String review_text;
 
     @Schema(description = "Update timestamp")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updated_at;
 }

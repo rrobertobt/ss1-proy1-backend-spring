@@ -27,18 +27,18 @@ public class CreateVinylSpecialEditionResponseDto {
     private String color;
 
     @Schema(description = "Material description", example = "Vinilo con acabado holográfico especial")
-    private String materialDescription;
+    private String material_description;
 
     @Schema(description = "Extra content included", example = "Poster holográfico y stickers exclusivos")
-    private String extraContent;
+    private String extra_content;
 
     @Schema(description = "Whether this is a limited edition", example = "true")
-    private Boolean isLimited;
+    private Boolean is_limited;
 
     @Schema(description = "Limited quantity", example = "150")
-    private Integer limitedQuantity;
+    private Integer limited_quantity;
 
     @Schema(description = "Creation timestamp", example = "2025-01-15T10:30:00")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 }

@@ -15,11 +15,11 @@ import lombok.NoArgsConstructor;
 public class CassetteDetailsDto {
 
     @Schema(description = "Cassette category ID", example = "1")
-    private Integer cassetteCategoryId;
+    private Integer cassette_category_id;
 
     @Schema(description = "Cassette brand", example = "TDK")
     private String brand;
 
     @Schema(description = "Is chrome tape", example = "false")
-    private Boolean isChromeTape = false;
+    private Boolean is_chrome_tape = false;
 }

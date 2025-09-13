@@ -78,12 +78,12 @@ public class AdminUserServiceImpl implements AdminUserService {
                                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
                 // Update status fields
-                if (request.getIsActive() != null) {
-                        user.setIsActive(request.getIsActive());
+                if (request.getIs_active() != null) {
+                        user.setIsActive(request.getIs_active());
                 }
 
-                if (request.getIsBanned() != null) {
-                        user.setIsBanned(request.getIsBanned());
+                if (request.getIs_banned() != null) {
+                        user.setIsBanned(request.getIs_banned());
                 }
 
                 // Log the update for audit purposes
@@ -168,19 +168,19 @@ public class AdminUserServiceImpl implements AdminUserService {
                 dto.setId(user.getId());
                 dto.setUsername(user.getUsername());
                 dto.setEmail(user.getEmail());
-                dto.setFirstName(user.getFirstName());
-                dto.setLastName(user.getLastName());
-                dto.setIsActive(user.getIsActive());
-                dto.setIsBanned(user.getIsBanned());
-                dto.setIsVerified(user.getIsVerified());
-                dto.setTotalSpent(user.getTotalSpent());
-                dto.setTotalOrders(user.getTotalOrders());
-                dto.setDeletedCommentsCount(user.getDeletedCommentsCount());
-                dto.setCreatedAt(user.getCreatedAt());
+                dto.setFirst_name(user.getFirstName());
+                dto.setLast_name(user.getLastName());
+                dto.setIs_active(user.getIsActive());
+                dto.setIs_banned(user.getIsBanned());
+                dto.setIs_verified(user.getIsVerified());
+                dto.setTotal_spent(user.getTotalSpent());
+                dto.setTotal_orders(user.getTotalOrders());
+                dto.setDeleted_comments_count(user.getDeletedCommentsCount());
+                dto.setCreated_at(user.getCreatedAt());
 
                 // User type info
                 if (user.getUserType() != null) {
-                        dto.setUserType(new AdminUserListResponseDto.UserTypeDto(
+                        dto.setUser_type(new AdminUserListResponseDto.user_typeDto(
                                         user.getUserType().getId(),
                                         user.getUserType().getName()));
                 }
@@ -196,20 +196,20 @@ public class AdminUserServiceImpl implements AdminUserService {
                 dto.setId(user.getId());
                 dto.setUsername(user.getUsername());
                 dto.setEmail(user.getEmail());
-                dto.setFirstName(user.getFirstName());
-                dto.setLastName(user.getLastName());
-                dto.setBirthDate(user.getBirthDate());
+                dto.setFirst_name(user.getFirstName());
+                dto.setLast_name(user.getLastName());
+                dto.setBirth_date(user.getBirthDate());
                 dto.setPhone(user.getPhone());
-                dto.setIsActive(user.getIsActive());
-                dto.setIsBanned(user.getIsBanned());
-                dto.setIsVerified(user.getIsVerified());
-                dto.setIs2faEnabled(user.getIs2faEnabled());
-                dto.setTotalSpent(user.getTotalSpent());
-                dto.setTotalOrders(user.getTotalOrders());
-                dto.setDeletedCommentsCount(user.getDeletedCommentsCount());
-                dto.setFailedLoginAttempts(user.getFailedLoginAttempts());
-                dto.setLastLogin(user.getLastLogin());
-                dto.setCreatedAt(user.getCreatedAt());
+                dto.setIs_active(user.getIsActive());
+                dto.setIs_banned(user.getIsBanned());
+                dto.setIs_verified(user.getIsVerified());
+                dto.setIs_2fa_enabled(user.getIs2faEnabled());
+                dto.setTotal_spent(user.getTotalSpent());
+                dto.setTotal_orders(user.getTotalOrders());
+                dto.setDeleted_comments_count(user.getDeletedCommentsCount());
+                dto.setFailed_login_attempts(user.getFailedLoginAttempts());
+                dto.setLast_login(user.getLastLogin());
+                dto.setCreated_at(user.getCreatedAt());
 
                 // Gender info
                 if (user.getGender() != null) {
@@ -220,7 +220,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
                 // User type info
                 if (user.getUserType() != null) {
-                        dto.setUserType(new AdminUserDetailResponseDto.UserTypeDto(
+                        dto.setUser_type(new AdminUserDetailResponseDto.user_typeDto(
                                         user.getUserType().getId(),
                                         user.getUserType().getName()));
                 }
@@ -235,19 +235,19 @@ public class AdminUserServiceImpl implements AdminUserService {
                 CommentViolationResponseDto.ViolationDto dto = new CommentViolationResponseDto.ViolationDto();
 
                 dto.setId(comment.getId());
-                dto.setCommentText(comment.getCommentText());
-                dto.setDeletedReason(comment.getDeletedReason());
-                dto.setDeletedAt(comment.getDeletedAt());
+                dto.setComment_text(comment.getCommentText());
+                dto.setDeleted_reason(comment.getDeletedReason());
+                dto.setDeleted_at(comment.getDeletedAt());
 
                 // Article info
                 if (comment.getAnalogArticle() != null) {
-                        dto.setArticleId(comment.getAnalogArticle().getId());
-                        dto.setArticleTitle(comment.getAnalogArticle().getTitle());
+                        dto.setArticle_id(comment.getAnalogArticle().getId());
+                        dto.setArticle_title(comment.getAnalogArticle().getTitle());
                 }
 
                 // Deleted by user info
                 if (comment.getDeletedByUser() != null) {
-                        dto.setDeletedByUser(new CommentViolationResponseDto.DeletedByUserDto(
+                        dto.setDeleted_by_user(new CommentViolationResponseDto.deleted_by_userDto(
                                         comment.getDeletedByUser().getId(),
                                         comment.getDeletedByUser().getUsername()));
                 }

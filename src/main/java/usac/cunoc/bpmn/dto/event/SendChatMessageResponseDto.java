@@ -19,14 +19,14 @@ public class SendChatMessageResponseDto {
     private Integer messageId;
 
     @Schema(description = "Event ID", example = "1")
-    private Integer eventId;
+    private Integer event_id;
 
     @Schema(description = "User ID", example = "2")
-    private Integer userId;
+    private Integer user_id;
 
     @Schema(description = "Message content", example = "Hello everyone!")
     private String message;
 
     @Schema(description = "Message sent date and time")
-    private LocalDateTime sentAt;
+    private LocalDateTime sent_at;
 }

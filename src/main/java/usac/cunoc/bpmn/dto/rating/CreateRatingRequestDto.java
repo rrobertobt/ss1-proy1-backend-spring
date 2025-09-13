@@ -25,7 +25,7 @@ public class CreateRatingRequestDto {
     @Schema(description = "Rating value from 1 to 5", example = "4", required = true)
     private Integer rating;
 
-    @Size(max = 1000, message = "reviewText no puede exceder 1000 caracteres")
+    @Size(max = 1000, message = "review_text no puede exceder 1000 caracteres")
     @Schema(description = "Review text (optional)", example = "Excelente álbum, muy recomendado")
-    private String reviewText;
+    private String review_text;
 }

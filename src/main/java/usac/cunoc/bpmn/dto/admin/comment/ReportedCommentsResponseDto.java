@@ -33,7 +33,7 @@ public class ReportedCommentsResponseDto {
         private Integer id;
 
         @Schema(description = "Comment text", example = "This is a reported comment")
-        private String commentText;
+        private String comment_text;
 
         @Schema(description = "User who posted the comment")
         private UserDto user;
@@ -49,11 +49,11 @@ public class ReportedCommentsResponseDto {
 
         @Schema(description = "Comment creation date")
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        private LocalDateTime createdAt;
+        private LocalDateTime created_at;
 
         @Schema(description = "Date when comment was reported")
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-        private LocalDateTime reportedAt;
+        private LocalDateTime reported_at;
     }
 
     @Data

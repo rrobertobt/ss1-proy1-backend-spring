@@ -37,22 +37,22 @@ public class CatalogArticleDto {
     private GenreDto genre;
 
     @Schema(description = "Article image URL", example = "https://example.com/images/abbey-road.jpg")
-    private String imageUrl;
+    private String image_url;
 
     @Schema(description = "Average rating", example = "4.5")
-    private BigDecimal averageRating;
+    private BigDecimal average_rating;
 
     @Schema(description = "Total ratings count", example = "128")
-    private Integer totalRatings;
+    private Integer total_ratings;
 
     @Schema(description = "Stock quantity", example = "15")
-    private Integer stockQuantity;
+    private Integer stock_quantity;
 
     @Schema(description = "Is article available", example = "true")
-    private Boolean isAvailable;
+    private Boolean is_available;
 
     @Schema(description = "Is article in preorder", example = "false")
-    private Boolean isPreorder;
+    private Boolean is_preorder;
 
     @Data
     @NoArgsConstructor

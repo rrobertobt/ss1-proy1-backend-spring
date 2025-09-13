@@ -17,9 +17,9 @@ import java.time.LocalDateTime;
 public class ReportCommentResponseDto {
 
     @Schema(description = "Reported comment ID", example = "1")
-    private Integer commentId;
+    private Integer comment_id;
 
     @Schema(description = "Timestamp when comment was reported")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime reportedAt;
+    private LocalDateTime reported_at;
 }

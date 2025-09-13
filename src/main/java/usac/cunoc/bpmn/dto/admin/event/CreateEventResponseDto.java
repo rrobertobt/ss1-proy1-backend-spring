@@ -25,17 +25,17 @@ public class CreateEventResponseDto {
     private String description;
 
     @Schema(description = "Associated article ID", example = "1")
-    private Integer articleId;
+    private Integer article_id;
 
     @Schema(description = "Event start date and time")
-    private LocalDateTime startDatetime;
+    private LocalDateTime start_datetime;
 
     @Schema(description = "Event end date and time")
-    private LocalDateTime endDatetime;
+    private LocalDateTime end_datetime;
 
     @Schema(description = "Event status", example = "Programado")
     private String status;
 
     @Schema(description = "Event creation date")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 }

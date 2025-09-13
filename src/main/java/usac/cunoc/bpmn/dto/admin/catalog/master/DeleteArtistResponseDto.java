@@ -17,15 +17,15 @@ import java.time.LocalDateTime;
 public class DeleteArtistResponseDto {
 
     @Schema(description = "Artist ID", example = "1")
-    private Integer artistId;
+    private Integer artist_id;
 
     @Schema(description = "Artist name", example = "The Beatles")
     private String name;
 
     @Schema(description = "Deletion status", example = "true")
-    private Boolean isDeleted;
+    private Boolean is_deleted;
 
     @Schema(description = "Deletion timestamp", example = "2025-01-15T10:30:00")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime deletedAt;
+    private LocalDateTime deleted_at;
 }

@@ -26,14 +26,14 @@ public class OrderItemDto {
     private Integer quantity;
 
     @Schema(description = "Unit price at time of order", example = "45.99")
-    private BigDecimal unitPrice;
+    private BigDecimal unit_price;
 
     @Schema(description = "Discount amount applied", example = "5.00")
-    private BigDecimal discountAmount;
+    private BigDecimal discount_amount;
 
     @Schema(description = "Total price for this item", example = "86.98")
-    private BigDecimal totalPrice;
+    private BigDecimal total_price;
 
     @Schema(description = "Applied promotion name", example = "3x2 CD Promotion")
-    private String promotionName;
+    private String promotion_name;
 }

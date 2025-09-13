@@ -38,44 +38,44 @@ public class AdminUserListResponseDto {
         private String email;
 
         @Schema(description = "First name", example = "John")
-        private String firstName;
+        private String first_name;
 
         @Schema(description = "Last name", example = "Doe")
-        private String lastName;
+        private String last_name;
 
         @Schema(description = "User type information")
-        private UserTypeDto userType;
+        private user_typeDto user_type;
 
         @Schema(description = "Whether account is active", example = "true")
-        private Boolean isActive;
+        private Boolean is_active;
 
         @Schema(description = "Whether account is banned", example = "false")
-        private Boolean isBanned;
+        private Boolean is_banned;
 
         @Schema(description = "Whether email is verified", example = "true")
-        private Boolean isVerified;
+        private Boolean is_verified;
 
         @Schema(description = "Total amount spent", example = "1250.50")
-        private BigDecimal totalSpent;
+        private BigDecimal total_spent;
 
         @Schema(description = "Total number of orders", example = "15")
-        private Integer totalOrders;
+        private Integer total_orders;
 
         @Schema(description = "Number of deleted comments", example = "0")
-        private Integer deletedCommentsCount;
+        private Integer deleted_comments_count;
 
         @Schema(description = "Account creation date")
-        private LocalDateTime createdAt;
+        private LocalDateTime created_at;
 
         @Schema(description = "Last login date")
-        private LocalDateTime lastLogin;
+        private LocalDateTime last_login;
     }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @Schema(description = "User type information")
-    public static class UserTypeDto {
+    public static class user_typeDto {
         @Schema(description = "User type ID", example = "1")
         private Integer id;
 
@@ -89,15 +89,15 @@ public class AdminUserListResponseDto {
     @Schema(description = "Pagination information")
     public static class PaginationDto {
         @Schema(description = "Current page number", example = "1")
-        private Integer currentPage;
+        private Integer current_page;
 
         @Schema(description = "Total number of pages", example = "10")
-        private Integer totalPages;
+        private Integer total_pages;
 
         @Schema(description = "Total number of items", example = "95")
-        private Integer totalItems;
+        private Integer total_items;
 
         @Schema(description = "Items per page", example = "10")
-        private Integer itemsPerPage;
+        private Integer items_per_page;
     }
 }

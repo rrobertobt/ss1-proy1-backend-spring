@@ -250,9 +250,12 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     private BigDecimal toBigDecimal(Object value) {
-        if (value == null) return BigDecimal.ZERO;
-        if (value instanceof BigDecimal) return (BigDecimal) value;
-        if (value instanceof Number) return BigDecimal.valueOf(((Number) value).doubleValue());
+        if (value == null)
+            return BigDecimal.ZERO;
+        if (value instanceof BigDecimal)
+            return (BigDecimal) value;
+        if (value instanceof Number)
+            return BigDecimal.valueOf(((Number) value).doubleValue());
         try {
             return new BigDecimal(value.toString());
         } catch (Exception e) {
@@ -266,12 +269,12 @@ public class CatalogServiceImpl implements CatalogService {
         dto.setId(article.getId());
         dto.setTitle(article.getTitle());
         dto.setPrice(article.getPrice());
-        dto.setImageUrl(article.getImageUrl());
-        dto.setAverageRating(article.getAverageRating());
-        dto.setTotalRatings(article.getTotalRatings());
-        dto.setStockQuantity(article.getStockQuantity());
-        dto.setIsAvailable(article.getIsAvailable());
-        dto.setIsPreorder(article.getIsPreorder());
+        dto.setImage_url(article.getImageUrl());
+        dto.setAverage_rating(article.getAverageRating());
+        dto.setTotal_ratings(article.getTotalRatings());
+        dto.setStock_quantity(article.getStockQuantity());
+        dto.setIs_available(article.getIsAvailable());
+        dto.setIs_preorder(article.getIsPreorder());
 
         // Artist info
         if (article.getArtist() != null) {
@@ -308,17 +311,17 @@ public class CatalogServiceImpl implements CatalogService {
         dto.setDescription(article.getDescription());
         dto.setPrice(article.getPrice());
         dto.setDimensions(article.getDimensions());
-        dto.setWeightGrams(article.getWeightGrams());
+        dto.setWeight_grams(article.getWeightGrams());
         dto.setBarcode(article.getBarcode());
-        dto.setReleaseDate(article.getReleaseDate());
-        dto.setImageUrl(article.getImageUrl());
-        dto.setStockQuantity(article.getStockQuantity());
-        dto.setIsAvailable(article.getIsAvailable());
-        dto.setIsPreorder(article.getIsPreorder());
-        dto.setPreorderReleaseDate(article.getPreorderReleaseDate());
-        dto.setPreorderEndDate(article.getPreorderEndDate());
-        dto.setAverageRating(article.getAverageRating());
-        dto.setTotalRatings(article.getTotalRatings());
+        dto.setRelease_date(article.getReleaseDate());
+        dto.setImage_url(article.getImageUrl());
+        dto.setStock_quantity(article.getStockQuantity());
+        dto.setIs_available(article.getIsAvailable());
+        dto.setIs_preorder(article.getIsPreorder());
+        dto.setPre_order_release_date(article.getPreorderReleaseDate());
+        dto.setPre_order_end_date(article.getPreorderEndDate());
+        dto.setAverage_rating(article.getAverageRating());
+        dto.setTotal_ratings(article.getTotalRatings());
 
         // Artist info
         if (article.getArtist() != null) {
@@ -351,7 +354,7 @@ public class CatalogServiceImpl implements CatalogService {
         // ENHANCED: Add type and type-specific details
         String articleType = determineArticleType(article.getId());
         dto.setType(articleType);
-        dto.setTypeDetails(getTypeSpecificDetails(article.getId(), articleType)); // FIXED method name
+        dto.setType_details(getTypeSpecificDetails(article.getId(), articleType)); // FIXED method name
 
         return dto;
     }
@@ -360,12 +363,12 @@ public class CatalogServiceImpl implements CatalogService {
     private ArticleCommentDto mapToCommentDto(ArticleComment comment) {
         ArticleCommentDto dto = new ArticleCommentDto();
         dto.setId(comment.getId());
-        dto.setCommentText(comment.getCommentText());
+        dto.setComment_text(comment.getCommentText());
         // FIXED: Use correct method for parent comment ID
-        dto.setParentCommentId(comment.getParentComment() != null ? comment.getParentComment().getId() : null);
-        dto.setLikesCount(comment.getLikesCount());
-        dto.setCreatedAt(comment.getCreatedAt());
-        dto.setUpdatedAt(comment.getUpdatedAt());
+        dto.setParent_comment_id(comment.getParentComment() != null ? comment.getParentComment().getId() : null);
+        dto.setLikes_count(comment.getLikesCount());
+        dto.setCreated_at(comment.getCreatedAt());
+        dto.setUpdated_at(comment.getUpdatedAt());
 
         // User info - FIXED: Use correct DTO class
         if (comment.getUser() != null) {
@@ -396,11 +399,11 @@ public class CatalogServiceImpl implements CatalogService {
         ArticleRatingDto dto = new ArticleRatingDto();
         dto.setId(rating.getId());
         dto.setRating(rating.getRating());
-        dto.setReviewText(rating.getReviewText());
-        dto.setIsVerifiedPurchase(rating.getIsVerifiedPurchase());
-        dto.setHelpfulVotes(rating.getHelpfulVotes());
-        dto.setCreatedAt(rating.getCreatedAt());
-        dto.setUpdatedAt(rating.getUpdatedAt());
+        dto.setReview_text(rating.getReviewText());
+        dto.setIs_verified_purchase(rating.getIsVerifiedPurchase());
+        dto.setHelpful_votes(rating.getHelpfulVotes());
+        dto.setCreated_at(rating.getCreatedAt());
+        dto.setUpdated_at(rating.getUpdatedAt());
 
         // User info - FIXED: Use correct DTO class
         if (rating.getUser() != null) {
@@ -543,11 +546,15 @@ public class CatalogServiceImpl implements CatalogService {
         if (priceRange != null) {
             if (priceRange.length == 1 && priceRange[0] instanceof Object[]) {
                 Object[] row = (Object[]) priceRange[0];
-                if (row.length > 0) minPrice = toBigDecimal(row[0]);
-                if (row.length > 1) maxPrice = toBigDecimal(row[1]);
+                if (row.length > 0)
+                    minPrice = toBigDecimal(row[0]);
+                if (row.length > 1)
+                    maxPrice = toBigDecimal(row[1]);
             } else {
-                if (priceRange.length > 0) minPrice = toBigDecimal(priceRange[0]);
-                if (priceRange.length > 1) maxPrice = toBigDecimal(priceRange[1]);
+                if (priceRange.length > 0)
+                    minPrice = toBigDecimal(priceRange[0]);
+                if (priceRange.length > 1)
+                    maxPrice = toBigDecimal(priceRange[1]);
             }
         }
         CatalogArticlesResponseDto.PriceRangeDto priceRangeDto = new CatalogArticlesResponseDto.PriceRangeDto(

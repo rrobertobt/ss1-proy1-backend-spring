@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 
 /**
  * Request DTO for preorder payment from wishlist
- * Matches PDF specification exactly for POST /api/v1/wishlist/items/{id}/preorder-payment
+ * Matches PDF specification exactly for POST
+ * /api/v1/wishlist/items/{id}/preorder-payment
  */
 @Data
 @NoArgsConstructor
@@ -17,11 +18,11 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Request to pay for preorder from wishlist")
 public class WishlistPreorderPaymentRequestDto {
 
-    @NotNull(message = "paymentMethodId es requerido")
-    @Positive(message = "paymentMethodId debe ser positivo")
+    @NotNull(message = "payment_method_id es requerido")
+    @Positive(message = "payment_method_id debe ser positivo")
     @Schema(description = "Payment method ID", example = "1", required = true)
-    private Integer paymentMethodId;
+    private Integer payment_method_id;
 
     @Schema(description = "Card ID if payment method requires card", example = "5")
-    private Integer cardId;
+    private Integer card_id;
 }

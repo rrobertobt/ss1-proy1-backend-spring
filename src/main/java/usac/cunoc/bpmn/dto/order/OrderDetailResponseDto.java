@@ -24,7 +24,7 @@ public class OrderDetailResponseDto {
     private Integer id;
 
     @Schema(description = "Order number", example = "ORD-2025-001234")
-    private String orderNumber;
+    private String order_number;
 
     @Schema(description = "Order status information")
     private StatusDto status;
@@ -36,25 +36,25 @@ public class OrderDetailResponseDto {
     private BigDecimal subtotal;
 
     @Schema(description = "Tax amount", example = "12.00")
-    private BigDecimal taxAmount;
+    private BigDecimal tax_amount;
 
     @Schema(description = "Discount amount", example = "5.00")
-    private BigDecimal discountAmount;
+    private BigDecimal discount_amount;
 
     @Schema(description = "Shipping cost", example = "18.50")
-    private BigDecimal shippingCost;
+    private BigDecimal shipping_cost;
 
     @Schema(description = "Total order amount", example = "125.50")
-    private BigDecimal totalAmount;
+    private BigDecimal total_amount;
 
     @Schema(description = "Total number of items", example = "3")
-    private Integer totalItems;
+    private Integer total_items;
 
     @Schema(description = "Shipping address information")
-    private UserAddressDto shippingAddress;
+    private UserAddressDto shipping_address;
 
     @Schema(description = "Billing address information")
-    private UserAddressDto billingAddress;
+    private UserAddressDto billing_address;
 
     @Schema(description = "Order notes", example = "Please deliver during business hours")
     private String notes;
@@ -66,7 +66,7 @@ public class OrderDetailResponseDto {
     private List<PaymentDto> payments;
 
     @Schema(description = "Order creation timestamp", example = "2025-09-08T10:30:00")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 
     @Schema(description = "Order shipped timestamp", example = "2025-09-09T14:20:00")
     private LocalDateTime shippedAt;
@@ -75,5 +75,5 @@ public class OrderDetailResponseDto {
     private LocalDateTime deliveredAt;
 
     @Schema(description = "Last update timestamp", example = "2025-09-08T11:15:00")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updated_at;
 }

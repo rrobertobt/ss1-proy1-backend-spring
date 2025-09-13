@@ -19,5 +19,5 @@ public class ResetPasswordRequestDto {
     @NotBlank(message = "New password is required")
     @Size(min = 8, message = "Password must be at least 8 characters")
     @Schema(description = "New password", example = "NewSecurePass123!")
-    private String newPassword;
+    private String new_password;
 }

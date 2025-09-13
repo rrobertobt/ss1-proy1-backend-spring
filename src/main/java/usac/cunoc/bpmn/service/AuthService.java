@@ -40,7 +40,7 @@ public interface AuthService {
     /**
      * Refresh authentication tokens
      */
-    RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto request);
+    refreshTokenResponseDto refreshToken(refreshTokenRequestDto request);
 
     /**
      * Logout user

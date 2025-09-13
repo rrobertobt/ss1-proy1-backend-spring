@@ -16,11 +16,11 @@ import java.time.LocalDateTime;
 public class EventRegistrationResponseDto {
 
     @Schema(description = "Event ID", example = "1")
-    private Integer eventId;
+    private Integer event_id;
 
     @Schema(description = "User ID", example = "2")
-    private Integer userId;
+    private Integer user_id;
 
     @Schema(description = "Registration date and time")
-    private LocalDateTime registeredAt;
+    private LocalDateTime registered_at;
 }

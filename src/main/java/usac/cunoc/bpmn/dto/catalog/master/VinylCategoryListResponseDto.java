@@ -33,6 +33,6 @@ public class VinylCategoryListResponseDto {
         private String description;
 
         @Schema(description = "Typical RPM", example = "33")
-        private Integer typicalRpm;
+        private Integer typical_rpm;
     }
 }

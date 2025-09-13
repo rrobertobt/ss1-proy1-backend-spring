@@ -40,7 +40,7 @@ public class ArticleDetailResponseDto {
 
     @Schema(description = "Release date", example = "1969-09-26", type = "string", format = "date")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate releaseDate;
+    private LocalDate release_date;
 
     @Schema(description = "Article description")
     private String description;
@@ -49,39 +49,39 @@ public class ArticleDetailResponseDto {
     private String dimensions;
 
     @Schema(description = "Weight in grams", example = "180")
-    private Integer weightGrams;
+    private Integer weight_grams;
 
     @Schema(description = "Barcode", example = "194397215915")
     private String barcode;
 
     @Schema(description = "Article image URL", example = "https://example.com/images/abbey-road.jpg")
-    private String imageUrl;
+    private String image_url;
 
     @Schema(description = "Average rating", example = "4.5")
-    private BigDecimal averageRating;
+    private BigDecimal average_rating;
 
     @Schema(description = "Total ratings count", example = "128")
-    private Integer totalRatings;
+    private Integer total_ratings;
 
     @Schema(description = "Stock quantity", example = "15")
-    private Integer stockQuantity;
+    private Integer stock_quantity;
 
     @Schema(description = "Is article available", example = "true")
-    private Boolean isAvailable;
+    private Boolean is_available;
 
     @Schema(description = "Is article in preorder", example = "false")
-    private Boolean isPreorder;
+    private Boolean is_preorder;
 
     @Schema(description = "Preorder release date", example = "2024-12-25", type = "string", format = "date")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate preorderReleaseDate;
+    private LocalDate pre_order_release_date;
 
     @Schema(description = "Preorder end date", example = "2024-12-20", type = "string", format = "date")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate preorderEndDate;
+    private LocalDate pre_order_end_date;
 
     @Schema(description = "Type-specific details")
-    private Object typeDetails;
+    private Object type_details;
 
     @Data
     @NoArgsConstructor
@@ -99,14 +99,14 @@ public class ArticleDetailResponseDto {
 
         @Schema(description = "Formation date", example = "1960-08-01", type = "string", format = "date")
         @JsonFormat(pattern = "yyyy-MM-dd")
-        private LocalDate formationDate;
+        private LocalDate formation_date;
 
         @Schema(description = "Career start date", example = "1960-08-01", type = "string", format = "date")
         @JsonFormat(pattern = "yyyy-MM-dd")
-        private LocalDate careerStartDate;
+        private LocalDate career_start_date;
 
         @Schema(description = "Is this a band", example = "true")
-        private Boolean isBand;
+        private Boolean is_band;
 
         @Schema(description = "Artist website", example = "https://www.thebeatles.com")
         private String website;

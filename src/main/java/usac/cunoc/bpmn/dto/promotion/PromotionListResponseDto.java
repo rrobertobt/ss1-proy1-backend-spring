@@ -33,38 +33,38 @@ public class PromotionListResponseDto {
         private String name;
 
         @Schema(description = "Promotion type details")
-        private PromotionTypeDto promotionType;
+        private promotion_typeDto promotion_type;
 
         @Schema(description = "Genre details (only for genre-based promotions)")
         private GenreDto genre;
 
         @Schema(description = "Discount percentage", example = "10.00")
-        private BigDecimal discountPercentage;
+        private BigDecimal discount_percentage;
 
         @Schema(description = "Maximum items allowed", example = "4")
-        private Integer maxItems;
+        private Integer max_items;
 
         @Schema(description = "Promotion start date")
-        private LocalDateTime startDate;
+        private LocalDateTime start_date;
 
         @Schema(description = "Promotion end date")
-        private LocalDateTime endDate;
+        private LocalDateTime end_date;
 
         @Schema(description = "Whether promotion is active", example = "true")
-        private Boolean isActive;
+        private Boolean is_active;
 
         @Schema(description = "Number of times used", example = "15")
-        private Integer usageCount;
+        private Integer usage_count;
 
         @Schema(description = "List of eligible articles")
-        private List<EligibleArticleDto> eligibleArticles;
+        private List<EligibleArticleDto> eligible_articles;
     }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @Schema(description = "Promotion type details")
-    public static class PromotionTypeDto {
+    public static class promotion_typeDto {
 
         @Schema(description = "Promotion type ID", example = "1")
         private Integer id;
@@ -73,10 +73,10 @@ public class PromotionListResponseDto {
         private String name;
 
         @Schema(description = "Maximum items for this type", example = "4")
-        private Integer maxItems;
+        private Integer max_items;
 
         @Schema(description = "Default discount percentage", example = "10.00")
-        private BigDecimal discountPercentage;
+        private BigDecimal discount_percentage;
     }
 
     @Data
@@ -111,6 +111,6 @@ public class PromotionListResponseDto {
         private BigDecimal price;
 
         @Schema(description = "Article image URL")
-        private String imageUrl;
+        private String image_url;
     }
 }

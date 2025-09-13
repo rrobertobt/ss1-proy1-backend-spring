@@ -62,7 +62,7 @@ public class ArticleRatingServiceImpl implements ArticleRatingService {
         rating.setAnalogArticle(article);
         rating.setUser(user);
         rating.setRating(request.getRating());
-        rating.setReviewText(request.getReviewText());
+        rating.setReviewText(request.getReview_text());
         rating.setIsVerifiedPurchase(isVerifiedPurchase);
 
         // Save rating
@@ -101,7 +101,7 @@ public class ArticleRatingServiceImpl implements ArticleRatingService {
 
         // Update rating
         rating.setRating(request.getRating());
-        rating.setReviewText(request.getReviewText());
+        rating.setReviewText(request.getReview_text());
 
         // Save updated rating
         ArticleRating updatedRating = articleRatingRepository.save(rating);

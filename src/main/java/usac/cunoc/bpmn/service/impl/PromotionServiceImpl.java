@@ -74,7 +74,7 @@ public class PromotionServiceImpl implements PromotionService {
 
     private PromotionListResponseDto.PromotionDto mapToPromotionDto(CdPromotion promotion) {
         // Map promotion type
-        PromotionListResponseDto.PromotionTypeDto promotionTypeDto = new PromotionListResponseDto.PromotionTypeDto(
+        PromotionListResponseDto.promotion_typeDto promotionTypeDto = new PromotionListResponseDto.promotion_typeDto(
                 promotion.getCdPromotionType().getId(),
                 promotion.getCdPromotionType().getName(),
                 promotion.getCdPromotionType().getMaxItems(),

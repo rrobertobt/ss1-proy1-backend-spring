@@ -15,11 +15,11 @@ import lombok.NoArgsConstructor;
 public class RegisterResponseDto {
 
     @Schema(description = "Created user ID", example = "1")
-    private Integer userId;
+    private Integer user_id;
 
     @Schema(description = "User email address", example = "john.doe@example.com")
     private String email;
 
     @Schema(description = "Whether email verification is required", example = "true")
-    private Boolean verificationRequired;
+    private Boolean verification_required;
 }

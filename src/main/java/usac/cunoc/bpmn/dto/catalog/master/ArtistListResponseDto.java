@@ -30,7 +30,7 @@ public class ArtistListResponseDto {
         private String name;
 
         @Schema(description = "Is this a band", example = "true")
-        private Boolean isBand;
+        private Boolean is_band;
 
         @Schema(description = "Artist website", example = "https://www.thebeatles.com")
         private String website;

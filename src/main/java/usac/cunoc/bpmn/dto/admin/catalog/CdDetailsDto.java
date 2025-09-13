@@ -15,11 +15,11 @@ import lombok.NoArgsConstructor;
 public class CdDetailsDto {
 
     @Schema(description = "Number of discs", example = "1")
-    private Integer discCount = 1;
+    private Integer discount = 1;
 
     @Schema(description = "Has bonus content", example = "false")
-    private Boolean hasBonusContent = false;
+    private Boolean has_bonus_content = false;
 
     @Schema(description = "Is remastered version", example = "false")
-    private Boolean isRemastered = false;
+    private Boolean is_remastered = false;
 }

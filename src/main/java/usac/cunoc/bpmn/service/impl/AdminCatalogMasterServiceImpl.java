@@ -44,18 +44,18 @@ public class AdminCatalogMasterServiceImpl implements AdminCatalogMasterService 
         }
 
         // Validate country exists
-        Country country = countryRepository.findById(request.getCountryId())
+        Country country = countryRepository.findById(request.getCountry_id())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Country not found with ID: " + request.getCountryId()));
+                        () -> new ResourceNotFoundException("Country not found with ID: " + request.getCountry_id()));
 
         // Create new artist entity
         Artist artist = new Artist();
         artist.setName(request.getName());
         artist.setBiography(request.getBiography());
-        artist.setFormationDate(request.getFormationDate());
-        artist.setCareerStartDate(request.getCareerStartDate());
+        artist.setFormationDate(request.getFormation_date());
+        artist.setCareerStartDate(request.getCareer_start_date());
         artist.setCountry(country);
-        artist.setIsBand(request.getIsBand());
+        artist.setIsBand(request.getIs_band());
         artist.setWebsite(request.getWebsite());
         artist.setTotalSales(0);
 
@@ -93,17 +93,17 @@ public class AdminCatalogMasterServiceImpl implements AdminCatalogMasterService 
         }
 
         // Validate country exists
-        Country country = countryRepository.findById(request.getCountryId())
+        Country country = countryRepository.findById(request.getCountry_id())
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Country not found with ID: " + request.getCountryId()));
+                        () -> new ResourceNotFoundException("Country not found with ID: " + request.getCountry_id()));
 
         // Update artist entity
         artist.setName(request.getName());
         artist.setBiography(request.getBiography());
-        artist.setFormationDate(request.getFormationDate());
-        artist.setCareerStartDate(request.getCareerStartDate());
+        artist.setFormationDate(request.getFormation_date());
+        artist.setCareerStartDate(request.getCareer_start_date());
         artist.setCountry(country);
-        artist.setIsBand(request.getIsBand());
+        artist.setIsBand(request.getIs_band());
         artist.setWebsite(request.getWebsite());
 
         // Save updated artist
@@ -184,17 +184,17 @@ public class AdminCatalogMasterServiceImpl implements AdminCatalogMasterService 
         }
 
         // Validate business rules - enhanced validation
-        if (Boolean.TRUE.equals(request.getIsLimited())) {
-            if (request.getLimitedQuantity() == null || request.getLimitedQuantity() <= 0) {
+        if (Boolean.TRUE.equals(request.getIs_limited())) {
+            if (request.getLimited_quantity() == null || request.getLimited_quantity() <= 0) {
                 throw new IllegalArgumentException("Las ediciones limitadas deben tener una cantidad válida mayor a 0");
             }
-            if (request.getLimitedQuantity() > 10000) {
+            if (request.getLimited_quantity() > 10000) {
                 throw new IllegalArgumentException("La cantidad limitada no puede exceder 10,000 unidades");
             }
         }
 
-        if (Boolean.FALSE.equals(request.getIsLimited()) && request.getLimitedQuantity() != null
-                && request.getLimitedQuantity() > 0) {
+        if (Boolean.FALSE.equals(request.getIs_limited()) && request.getLimited_quantity() != null
+                && request.getLimited_quantity() > 0) {
             throw new IllegalArgumentException("Las ediciones no limitadas no pueden tener una cantidad limitada");
         }
 
@@ -202,10 +202,10 @@ public class AdminCatalogMasterServiceImpl implements AdminCatalogMasterService 
         VinylSpecialEdition edition = new VinylSpecialEdition();
         edition.setName(request.getName());
         edition.setColor(request.getColor());
-        edition.setMaterialDescription(request.getMaterialDescription());
-        edition.setExtraContent(request.getExtraContent());
-        edition.setIsLimited(request.getIsLimited());
-        edition.setLimitedQuantity(request.getLimitedQuantity());
+        edition.setMaterialDescription(request.getMaterial_description());
+        edition.setExtraContent(request.getExtra_content());
+        edition.setIsLimited(request.getIs_limited());
+        edition.setLimitedQuantity(request.getLimited_quantity());
 
         // Save vinyl special edition
         VinylSpecialEdition savedEdition = vinylSpecialEditionRepository.save(edition);

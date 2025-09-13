@@ -28,7 +28,7 @@ public class TopRatedResponseDto {
     @Schema(description = "Rating criteria")
     public static class CriteriaDto {
         @Schema(description = "Minimum ratings required", example = "5")
-        private Integer minRatings;
+        private Integer min_ratings;
 
         @Schema(description = "Maximum results limit", example = "10")
         private Integer limit;
@@ -46,13 +46,13 @@ public class TopRatedResponseDto {
         private ArticleDto article;
 
         @Schema(description = "Average rating", example = "4.8")
-        private BigDecimal averageRating;
+        private BigDecimal average_rating;
 
         @Schema(description = "Total number of ratings", example = "25")
-        private Integer totalRatings;
+        private Integer total_ratings;
 
         @Schema(description = "Total units sold", example = "150")
-        private Integer totalSold;
+        private Integer total_sold;
     }
 
     @Data
@@ -73,6 +73,6 @@ public class TopRatedResponseDto {
         private String type;
 
         @Schema(description = "Article image URL", example = "https://example.com/image.jpg")
-        private String imageUrl;
+        private String image_url;
     }
 }
