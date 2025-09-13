@@ -224,7 +224,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public refreshTokenResponseDto refreshToken(refreshTokenRequestDto request) {
+    public RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto request) {
         try {
             String email = jwtUtil.extractUsername(request.getRefresh_token());
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
@@ -238,7 +238,7 @@ public class AuthServiceImpl implements AuthService {
                 String newRefreshToken = jwtUtil.generateRefreshToken(user);
 
                 // Return exact PDF JSON structure
-                return new refreshTokenResponseDto(newAccessToken, newRefreshToken);
+                return new RefreshTokenResponseDto(newAccessToken, newRefreshToken);
             } else {
                 throw new RuntimeException("Invalid refresh token");
             }

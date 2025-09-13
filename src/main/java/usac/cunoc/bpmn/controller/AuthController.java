@@ -115,10 +115,10 @@ public class AuthController {
                         @ApiResponse(responseCode = "200", description = "Token refreshed successfully"),
                         @ApiResponse(responseCode = "401", description = "Invalid refresh token")
         })
-        public ResponseEntity<ApiResponseDto<refreshTokenResponseDto>> refreshToken(
-                        @Valid @RequestBody refreshTokenRequestDto request) {
+        public ResponseEntity<ApiResponseDto<RefreshTokenResponseDto>> refreshToken(
+                        @Valid @RequestBody RefreshTokenRequestDto request) {
 
-                refreshTokenResponseDto response = authService.refreshToken(request);
+                RefreshTokenResponseDto response = authService.refreshToken(request);
                 return ResponseEntity.ok(ApiResponseDto.success(null, response));
         }
 
